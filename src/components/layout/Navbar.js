@@ -66,13 +66,22 @@ const Navbar = () => {
             )}
             
             {isAdminOrStaff && (
-              <Button
-                color="inherit"
-                component={RouterLink}
-                to="/services"
-              >
-                Servicios
-              </Button>
+              <>
+                <Button
+                  color="inherit"
+                  component={RouterLink}
+                  to="/services"
+                >
+                  Servicios
+                </Button>
+                <Button
+                  color="inherit"
+                  component={RouterLink}
+                  to="/locations"
+                >
+                  Locaciones
+                </Button>
+              </>
             )}
             
             <IconButton
