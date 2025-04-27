@@ -19,6 +19,11 @@ import UserDetail from './components/users/UserDetail';
 // Añadir el componente de la bitácora
 import AuditLogList from './components/audit/AuditLogList';
 
+// Componentes de servicios
+import ServiceList from './components/services/ServiceList';
+import ServiceForm from './components/services/ServiceForm';
+import ServiceDetail from './components/services/ServiceDetail';
+
 // Página de inicio provisional
 // Importar el nuevo componente Dashboard
 import Dashboard from './components/dashboard/Dashboard';
@@ -45,6 +50,14 @@ function App() {
             <Route path="/users/:id" element={<UserDetail />} />
             {/*Bitacora*/}
             <Route path="/audit-logs" element={<AuditLogList />} /> 
+          </Route>
+          
+          {/* Rutas privadas - Admin y Staff */}
+          <Route element={<PrivateRoute allowedRoles={['admin', 'staff']} />}>
+            <Route path="/services" element={<ServiceList />} />
+            <Route path="/services/new" element={<ServiceForm />} />
+            <Route path="/services/:id" element={<ServiceDetail />} />
+            <Route path="/services/:id/edit" element={<ServiceForm />} />
           </Route>
           
           {/* Rutas básicas para usuarios autenticados */}
