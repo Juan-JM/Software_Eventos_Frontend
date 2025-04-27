@@ -28,7 +28,6 @@ const Navbar = () => {
   };
 
   const isAdminOrStaff = currentUser && (currentUser.user_type === 'admin' || currentUser.user_type === 'staff');
-  const isCustomer = currentUser && currentUser.user_type === 'customer';
 
   return (
     <AppBar position="static">
@@ -60,6 +59,16 @@ const Navbar = () => {
                   Bitácora
                 </Button>
               </>
+            )}
+            
+            {isAdminOrStaff && (
+              <Button
+                color="inherit"
+                component={RouterLink}
+                to="/services"
+              >
+                Servicios
+              </Button>
             )}
             
             <IconButton
