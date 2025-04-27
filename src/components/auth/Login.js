@@ -4,7 +4,6 @@ import { login } from '../../services/auth.service';
 import { useAuth } from '../../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { TextField, Button, Typography, Container, Box, Alert } from '@mui/material';
-import api from '../../services/api'; // Importar api
 
 const Login = () => {
   const [username, setUsername] = useState('');
@@ -21,20 +20,8 @@ const Login = () => {
     setLoading(true);
     
     try {
-      const user = await login(username, password);
+      const user = await login(username, password); // Esta función ahora incluye el registro de auditoría
       setCurrentUser(user);
-      
-      // Registrar el evento de login en la bitácora personalizada (opcional)
-      try {
-        await api.post('audit/custom-log/', {
-          action: 'LOGIN',
-          model: 'Auth',
-          detail: `Inicio de sesión del usuario ${username}`
-        });
-      } catch (logError) {
-        console.error('Error registrando el login:', logError);
-      }
-      
       navigate('/dashboard');
     } catch (err) {
       setError('Credenciales inválidas. Por favor, inténtalo de nuevo.');

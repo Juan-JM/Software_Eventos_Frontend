@@ -24,6 +24,11 @@ import ServiceList from './components/services/ServiceList';
 import ServiceForm from './components/services/ServiceForm';
 import ServiceDetail from './components/services/ServiceDetail';
 
+// Componentes de locaciones
+import LocationList from './components/locations/LocationList';
+import LocationForm from './components/locations/LocationForm';
+import LocationDetail from './components/locations/LocationDetail';
+
 // Página de inicio provisional
 // Importar el nuevo componente Dashboard
 import Dashboard from './components/dashboard/Dashboard';
@@ -54,10 +59,17 @@ function App() {
           
           {/* Rutas privadas - Admin y Staff */}
           <Route element={<PrivateRoute allowedRoles={['admin', 'staff']} />}>
+            {/* Rutas para Servicios */}
             <Route path="/services" element={<ServiceList />} />
             <Route path="/services/new" element={<ServiceForm />} />
             <Route path="/services/:id" element={<ServiceDetail />} />
             <Route path="/services/:id/edit" element={<ServiceForm />} />
+            
+            {/* Rutas para Locaciones */}
+            <Route path="/locations" element={<LocationList />} />
+            <Route path="/locations/new" element={<LocationForm />} />
+            <Route path="/locations/:id" element={<LocationDetail />} />
+            <Route path="/locations/:id/edit" element={<LocationForm />} />
           </Route>
           
           {/* Rutas básicas para usuarios autenticados */}

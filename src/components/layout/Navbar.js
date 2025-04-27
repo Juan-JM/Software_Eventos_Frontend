@@ -6,6 +6,7 @@ import {
   Menu, MenuItem, Divider
 } from '@mui/material';
 import { AccountCircle } from '@mui/icons-material';
+import { logout } from '../../services/auth.service'; // Importación añadida
 
 const Navbar = () => {
   const { currentUser, setCurrentUser } = useAuth();
@@ -20,11 +21,14 @@ const Navbar = () => {
     setAnchorEl(null);
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem('access_token');
-    localStorage.removeItem('refresh_token');
-    setCurrentUser(null);
-    navigate('/login');
+  const handleLogout = async () => {
+    try {
+      await logout(); // Usa el servicio que ahora incluye auditoría
+      setCurrentUser(null);
+      navigate('/login');
+    } catch (error) {
+      console.error('Error al cerrar sesión:', error);
+    }
   };
 
   const isAdminOrStaff = currentUser && (currentUser.user_type === 'admin' || currentUser.user_type === 'staff');
@@ -39,7 +43,7 @@ const Navbar = () => {
         }}>
           PlanitOne
         </Typography>
-        
+
         {currentUser && (
           <>
             {currentUser.user_type === 'admin' && (
@@ -62,13 +66,22 @@ const Navbar = () => {
             )}
             
             {isAdminOrStaff && (
-              <Button
-                color="inherit"
-                component={RouterLink}
-                to="/services"
-              >
-                Servicios
-              </Button>
+              <>
+                <Button
+                  color="inherit"
+                  component={RouterLink}
+                  to="/services"
+                >
+                  Servicios
+                </Button>
+                <Button
+                  color="inherit"
+                  component={RouterLink}
+                  to="/locations"
+                >
+                  Locaciones
+                </Button>
+              </>
             )}
             
             <IconButton
@@ -101,11 +114,14 @@ const Navbar = () => {
                 Mi Perfil
               </MenuItem>
               <Divider />
-              <MenuItem onClick={handleLogout}>Cerrar Sesión</MenuItem>
+              <MenuItem onClick={() => {
+                handleClose();
+                handleLogout();
+              }}>Cerrar Sesión</MenuItem>
             </Menu>
           </>
         )}
-        
+
         {!currentUser && (
           <>
             <Button color="inherit" component={RouterLink} to="/login">
