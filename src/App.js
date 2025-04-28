@@ -16,7 +16,7 @@ import UserList from './components/users/UserList';
 import UserForm from './components/users/UserForm';
 import UserDetail from './components/users/UserDetail';
 
-// Añadir el componente de la bitácora
+// Componentes de la bitácora
 import AuditLogList from './components/audit/AuditLogList';
 
 // Componentes de servicios
@@ -29,11 +29,14 @@ import LocationList from './components/locations/LocationList';
 import LocationForm from './components/locations/LocationForm';
 import LocationDetail from './components/locations/LocationDetail';
 
+// Componentes de eventos 
+import EventList from './components/events/EventList';
+import EventForm from './components/events/EventForm';
+import EventDetail from './components/events/EventDetail';
+
 // Página de inicio provisional
-// Importar el nuevo componente Dashboard
 import Dashboard from './components/dashboard/Dashboard';
-// Página de inicio provisional
-//const Dashboard = () => <div>Dashboard</div>;
+
 const Unauthorized = () => <div>No tienes permisos para acceder a esta página</div>;
 
 function App() {
@@ -53,8 +56,7 @@ function App() {
             <Route path="/users" element={<UserList />} />
             <Route path="/users/new" element={<UserForm />} />
             <Route path="/users/:id" element={<UserDetail />} />
-            {/*Bitacora*/}
-            <Route path="/audit-logs" element={<AuditLogList />} /> 
+            <Route path="/audit-logs" element={<AuditLogList />} />
           </Route>
           
           {/* Rutas privadas - Admin y Staff */}
@@ -64,12 +66,18 @@ function App() {
             <Route path="/services/new" element={<ServiceForm />} />
             <Route path="/services/:id" element={<ServiceDetail />} />
             <Route path="/services/:id/edit" element={<ServiceForm />} />
-            
+
             {/* Rutas para Locaciones */}
             <Route path="/locations" element={<LocationList />} />
             <Route path="/locations/new" element={<LocationForm />} />
             <Route path="/locations/:id" element={<LocationDetail />} />
             <Route path="/locations/:id/edit" element={<LocationForm />} />
+
+            {/* Rutas para Eventos (AGREGADO AHORA) */}
+            <Route path="/events" element={<EventList />} />
+            <Route path="/events/new" element={<EventForm />} />
+            <Route path="/events/:id" element={<EventDetail />} />
+            <Route path="/events/:id/edit" element={<EventForm />} />
           </Route>
           
           {/* Rutas básicas para usuarios autenticados */}

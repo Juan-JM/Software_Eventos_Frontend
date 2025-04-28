@@ -81,6 +81,13 @@ const Navbar = () => {
                 >
                   Locaciones
                 </Button>
+                <Button
+                  color="inherit"
+                  component={RouterLink}
+                  to="/events"
+                >
+                  EVENTOS
+                </Button>
               </>
             )}
             
