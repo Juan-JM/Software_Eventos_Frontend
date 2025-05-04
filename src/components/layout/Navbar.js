@@ -6,7 +6,7 @@ import {
   Menu, MenuItem, Divider
 } from '@mui/material';
 import { AccountCircle } from '@mui/icons-material';
-import { logout } from '../../services/auth.service'; // Importación añadida
+import { logout } from '../../services/auth.service';
 
 const Navbar = () => {
   const { currentUser, setCurrentUser } = useAuth();
@@ -23,7 +23,7 @@ const Navbar = () => {
 
   const handleLogout = async () => {
     try {
-      await logout(); // Usa el servicio que ahora incluye auditoría
+      await logout();
       setCurrentUser(null);
       navigate('/login');
     } catch (error) {
@@ -45,52 +45,43 @@ const Navbar = () => {
         </Typography>
 
         {currentUser && (
+         <>
+        {/* Vistas exclusivas del superadmin */}
+        {currentUser.user_type === 'superadmin' && (
           <>
-            {currentUser.user_type === 'admin' && (
-              <>
-                <Button
-                  color="inherit"
-                  component={RouterLink}
-                  to="/users"
-                >
-                  Usuarios
-                </Button>
-                <Button
-                  color="inherit"
-                  component={RouterLink}
-                  to="/audit-logs"
-                >
-                  Bitácora
-                </Button>
-              </>
-            )}
-            
-            {isAdminOrStaff && (
-              <>
-                <Button
-                  color="inherit"
-                  component={RouterLink}
-                  to="/services"
-                >
-                  Servicios
-                </Button>
-                <Button
-                  color="inherit"
-                  component={RouterLink}
-                  to="/locations"
-                >
-                  Locaciones
-                </Button>
-                <Button
-                  color="inherit"
-                  component={RouterLink}
-                  to="/events"
-                >
-                  EVENTOS
-                </Button>
-              </>
-            )}
-            
+            <Button color="inherit" component={RouterLink} to="/companies">
+              Empresas
+            </Button>
+            <Button color="inherit" component={RouterLink} to="/users">
+              Usuarios
+            </Button>
+            <Button color="inherit" component={RouterLink} to="/audit-logs">
+              Bitácora
+            </Button>
+          </>
+        )}
+
+        {/* Vistas para admin de empresa (NO superadmin) */}
+        {(currentUser.user_type === 'admin' || currentUser.user_type === 'staff') && (
+            <>
+              <Button color="inherit" component={RouterLink} to="/users">
+                Usuarios
+              </Button>
+              <Button color="inherit" component={RouterLink} to="/services">
+                Servicios
+              </Button>
+              <Button color="inherit" component={RouterLink} to="/locations">
+                Locaciones
+              </Button>
+              <Button color="inherit" component={RouterLink} to="/events">
+                Eventos
+              </Button>
+              <Button color="inherit" component={RouterLink} to="/audit-logs">
+                Bitácora
+              </Button>
+            </>
+          )}
+
             <IconButton
               edge="end"
               color="inherit"
@@ -124,7 +115,9 @@ const Navbar = () => {
               <MenuItem onClick={() => {
                 handleClose();
                 handleLogout();
-              }}>Cerrar Sesión</MenuItem>
+              }}>
+                Cerrar Sesión
+              </MenuItem>
             </Menu>
           </>
         )}

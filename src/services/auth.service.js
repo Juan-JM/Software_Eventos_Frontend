@@ -11,7 +11,7 @@ export const login = async (username, password) => {
 
       // Registrar el login en la bitácora
       try {
-        await api.post('audit/audit/custom_log/', {
+        await api.post('audit/custom_log/', {
           action: 'LOGIN',
           model: 'Auth',
           detail: `Inicio de sesión del usuario "${username}"`
@@ -32,7 +32,7 @@ export const logout = async () => {
   // Registrar el logout en la bitácora antes de eliminar los tokens
   if (user) {
     try {
-      await api.post('audit/audit/custom_log/', {
+      await api.post('audit/custom_log/', {
         action: 'LOGOUT',
         model: 'Auth',
         detail: `Cierre de sesión del usuario "${user.username}"`
