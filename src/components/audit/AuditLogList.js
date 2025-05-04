@@ -28,33 +28,71 @@ const AuditLogList = () => {
     end_date: null
   });
 
+  // useEffect(() => {
+  //   if (!currentUser || currentUser.user_type !== 'admin') {
+  //     navigate('/unauthorized');
+  //     return;
+  //   }
+
+  //   // Cargar usuarios y logs en paralelo
+  //   const loadData = async () => {
+  //     try {
+  //       setLoading(true);
+  //       setUserLoading(true);
+
+  //       const [usersResponse] = await Promise.all([
+  //         getAllUsers(),
+  //         fetchLogs() // fetchLogs ya se llama aquí
+  //       ]);
+
+  //       setUsers(usersResponse.data);
+  //     } catch (error) {
+  //       console.error('Error loading data:', error);
+  //     } finally {
+  //       setUserLoading(false);
+  //     }
+  //   };
+
+  //   loadData();
+  // }, [currentUser, navigate]);
   useEffect(() => {
-    if (!currentUser || currentUser.user_type !== 'admin') {
+    if (!currentUser || !['admin', 'superadmin'].includes(currentUser.user_type)) {
       navigate('/unauthorized');
       return;
     }
-
+  
     // Cargar usuarios y logs en paralelo
     const loadData = async () => {
       try {
         setLoading(true);
         setUserLoading(true);
-
-        const [usersResponse] = await Promise.all([
-          getAllUsers(),
-          fetchLogs() // fetchLogs ya se llama aquí
-        ]);
-
+    
+        let usersResponse;
+    
+        if (currentUser.user_type === 'superadmin') {
+          usersResponse = await getAllUsers();
+        } else {
+          // Obtener solo los usuarios de su empresa (nuevo endpoint o filtro)
+          usersResponse = await api.get('/users/', {
+            params: { company: currentUser.company } // asumiendo que el token incluye company
+          });
+        }
+    
         setUsers(usersResponse.data);
+    
+        // Ahora sí, carga los logs
+        await fetchLogs();
       } catch (error) {
         console.error('Error loading data:', error);
       } finally {
         setUserLoading(false);
       }
     };
-
+    
+  
     loadData();
   }, [currentUser, navigate]);
+  
 
   const fetchLogs = async () => {
     try {
@@ -69,7 +107,7 @@ const AuditLogList = () => {
       if (filters.end_date && dayjs(filters.end_date).isValid())
         params.append('end_date', filters.end_date.format('YYYY-MM-DD'));  // const response = await api.get(`/audit/logs/${params.toString() ? '?' + params.toString() : ''}`);
 
-      const response = await api.get(`/audit/audit/${params.toString() ? '?' + params.toString() : ''}`);
+      const response = await api.get(`/audit/${params.toString() ? '?' + params.toString() : ''}`);
       setLogs(response.data);
     } catch (error) {
       console.error('Error fetching audit logs:', error);

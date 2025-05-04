@@ -34,6 +34,12 @@ import EventList from './components/events/EventList';
 import EventForm from './components/events/EventForm';
 import EventDetail from './components/events/EventDetail';
 
+// Componentes de company
+import CompanyList from './components/companies/CompanyList';
+import CompanyForm from './components/companies/CompanyForm';
+import CompanyDetail from './components/companies/CompanyDetail';
+
+
 // Página de inicio provisional
 import Dashboard from './components/dashboard/Dashboard';
 
@@ -50,15 +56,24 @@ function App() {
           <Route path="/register" element={<Register />} />
           <Route path="/logout" element={<Logout />} />
           <Route path="/unauthorized" element={<Unauthorized />} />
-          
-          {/* Rutas privadas - Solo Admin */}
-          <Route element={<PrivateRoute allowedRoles={['admin']} />}>
+        
+          {/* Rutas privadas - Admin y Superadmin */} 
+          <Route element={<PrivateRoute allowedRoles={['admin', 'superadmin']} />}>
             <Route path="/users" element={<UserList />} />
             <Route path="/users/new" element={<UserForm />} />
             <Route path="/users/:id" element={<UserDetail />} />
             <Route path="/audit-logs" element={<AuditLogList />} />
           </Route>
-          
+
+          {/* Rutas privadas - Solo Superadmin */}
+          <Route element={<PrivateRoute allowedRoles={['superadmin']} />}>
+            <Route path="/companies" element={<CompanyList />} />
+            <Route path="/companies/new" element={<CompanyForm />} />
+            <Route path="/companies/:id" element={<CompanyDetail />} />
+            <Route path="/companies/:id/edit" element={<CompanyForm />} />
+
+          </Route>
+
           {/* Rutas privadas - Admin y Staff */}
           <Route element={<PrivateRoute allowedRoles={['admin', 'staff']} />}>
             {/* Rutas para Servicios */}
@@ -78,12 +93,14 @@ function App() {
             <Route path="/events/new" element={<EventForm />} />
             <Route path="/events/:id" element={<EventDetail />} />
             <Route path="/events/:id/edit" element={<EventForm />} />
+
           </Route>
           
           {/* Rutas básicas para usuarios autenticados */}
           <Route element={<PrivateRoute />}>
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/profile" element={<div>Mi Perfil</div>} />
+            
           </Route>
           
           {/* Redirigir a dashboard si no hay ruta */}
