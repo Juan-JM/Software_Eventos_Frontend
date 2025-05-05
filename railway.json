@@ -1,0 +1,15 @@
+{
+    "build": {
+      "builder": "NIXPACKS",
+      "buildCommand": "npm run build"
+    },
+    "deploy": {
+      "startCommand": "npm start",
+      "healthcheckPath": "/",
+      "restartPolicyType": "ON_FAILURE"
+    },
+    "variables": {
+      "NODE_OPTIONS": "--max-old-space-size=2048",
+      "NODE_ENV": "production"
+    }
+  }
