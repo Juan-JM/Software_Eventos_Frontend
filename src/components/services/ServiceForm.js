@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { 
   TextField, Button, Box, Typography, MenuItem, FormControl, 
-  Select, InputLabel, CircularProgress, Grid, Paper, FormHelperText 
+  Select, InputLabel, CircularProgress, Grid, Paper 
 } from '@mui/material';
 import { createService, getServiceById, updateService } from '../../services/service.service';
 

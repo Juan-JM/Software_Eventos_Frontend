@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { getAllServices, deleteService } from '../../services/service.service';
-import { useAuth } from '../../contexts/AuthContext';
+// import { useAuth } from '../../contexts/AuthContext';
 import { 
   Table, TableBody, TableCell, TableContainer, TableHead, 
   TableRow, Paper, Button, Typography, Box, CircularProgress,
@@ -14,7 +14,7 @@ const ServiceList = () => {
   const [error, setError] = useState(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [serviceToDelete, setServiceToDelete] = useState(null);
-  const { currentUser } = useAuth();
+  // const { currentUser } = useAuth();
 
   const loadServices = async () => {
     try {

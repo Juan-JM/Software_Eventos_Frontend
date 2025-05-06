@@ -75,15 +75,15 @@ const EventList = () => {
     setEventToDelete(null);
   };
 
-  const renderStatus = (status) => {
-    const statuses = {
-      'scheduled': 'Programado',
-      'in_progress': 'En curso',
-      'completed': 'Finalizado',
-      'cancelled': 'Cancelado'
-    };
-    return statuses[status] || status;
-  };
+  // const renderStatus = (status) => {
+  //   const statuses = {
+  //     'scheduled': 'Programado',
+  //     'in_progress': 'En curso',
+  //     'completed': 'Finalizado',
+  //     'cancelled': 'Cancelado'
+  //   };
+  //   return statuses[status] || status;
+  // };
 
   if (loading) {
     return (

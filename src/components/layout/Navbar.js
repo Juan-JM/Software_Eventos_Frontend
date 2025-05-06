@@ -2,7 +2,7 @@ import React from 'react';
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import {
-  AppBar, Toolbar, Typography, Button, IconButton, Box,
+  AppBar, Toolbar, Typography, Button, IconButton,
   Menu, MenuItem, Divider
 } from '@mui/material';
 import { AccountCircle } from '@mui/icons-material';
@@ -31,7 +31,7 @@ const Navbar = () => {
     }
   };
 
-  const isAdminOrStaff = currentUser && (currentUser.user_type === 'admin' || currentUser.user_type === 'staff');
+  // const isAdminOrStaff = currentUser && (currentUser.user_type === 'admin' || currentUser.user_type === 'staff');
 
   return (
     <AppBar position="static">
@@ -45,42 +45,45 @@ const Navbar = () => {
         </Typography>
 
         {currentUser && (
-         <>
-        {/* Vistas exclusivas del superadmin */}
-        {currentUser.user_type === 'superadmin' && (
           <>
-            <Button color="inherit" component={RouterLink} to="/companies">
-              Empresas
-            </Button>
-            <Button color="inherit" component={RouterLink} to="/users">
-              Usuarios
-            </Button>
-            <Button color="inherit" component={RouterLink} to="/audit-logs">
-              Bitácora
-            </Button>
-          </>
-        )}
+            {/* Vistas exclusivas del superadmin */}
+            {currentUser.user_type === 'superadmin' && (
+              <>
+                <Button color="inherit" component={RouterLink} to="/companies">
+                  Empresas
+                </Button>
+                <Button color="inherit" component={RouterLink} to="/users">
+                  Usuarios
+                </Button>
+                <Button color="inherit" component={RouterLink} to="/audit-logs">
+                  Bitácora
+                </Button>
+              </>
+            )}
 
-        {/* Vistas para admin de empresa (NO superadmin) */}
-        {(currentUser.user_type === 'admin' || currentUser.user_type === 'staff') && (
-            <>
-              <Button color="inherit" component={RouterLink} to="/users">
-                Usuarios
-              </Button>
-              <Button color="inherit" component={RouterLink} to="/services">
-                Servicios
-              </Button>
-              <Button color="inherit" component={RouterLink} to="/locations">
-                Locaciones
-              </Button>
-              <Button color="inherit" component={RouterLink} to="/events">
-                Eventos
-              </Button>
-              <Button color="inherit" component={RouterLink} to="/audit-logs">
-                Bitácora
-              </Button>
-            </>
-          )}
+            {/* Vistas para admin de empresa (NO superadmin) */}
+            {(currentUser.user_type === 'admin' || currentUser.user_type === 'staff') && (
+              <>
+                <Button color="inherit" component={RouterLink} to="/subscription">
+                  Suscripción
+                </Button>
+                <Button color="inherit" component={RouterLink} to="/users">
+                  Usuarios
+                </Button>
+                <Button color="inherit" component={RouterLink} to="/services">
+                  Servicios
+                </Button>
+                <Button color="inherit" component={RouterLink} to="/locations">
+                  Locaciones
+                </Button>
+                <Button color="inherit" component={RouterLink} to="/events">
+                  Eventos
+                </Button>
+                <Button color="inherit" component={RouterLink} to="/audit-logs">
+                  Bitácora
+                </Button>
+              </>
+            )}
 
             <IconButton
               edge="end"

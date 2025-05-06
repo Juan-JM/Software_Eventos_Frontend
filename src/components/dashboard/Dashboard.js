@@ -1,10 +1,10 @@
 // frontend/src/components/dashboard/Dashboard.js
 import React from 'react';
 import { Container, Typography, Paper, Box, Divider } from '@mui/material';
-import { useAuth } from '../../contexts/AuthContext';
+// import { useAuth } from '../../contexts/AuthContext';
 
 const Dashboard = () => {
-  const { currentUser } = useAuth();
+  // const { currentUser } = useAuth();
 
   return (
     <Container maxWidth="md">
