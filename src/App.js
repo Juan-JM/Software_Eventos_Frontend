@@ -52,6 +52,9 @@ import SubscriptionRequired from './components/subscription/SubscriptionRequired
 // Página de inicio provisional
 import Dashboard from './components/dashboard/Dashboard';
 
+
+import BackupList from './components/backups/BackupList';
+
 const Unauthorized = () => <div>No tienes permisos para acceder a esta página</div>;
 
 // Componente para configurar los interceptores
@@ -93,6 +96,7 @@ function App() {
               <Route path="/users/new" element={<UserForm />} />
               <Route path="/users/:id" element={<UserDetail />} />
               <Route path="/audit-logs" element={<AuditLogList />} />
+              <Route path="/backups" element={< BackupList />} /> 
             </Route>
 
             {/* Rutas privadas - Solo Superadmin */}

@@ -64,6 +64,9 @@ const Navbar = () => {
             {/* Vistas para admin de empresa (NO superadmin) */}
             {(currentUser.user_type === 'admin' || currentUser.user_type === 'staff') && (
               <>
+                <Button color="inherit" component={RouterLink} to="/backups">
+                  Backups
+                </Button>
                 <Button color="inherit" component={RouterLink} to="/subscription">
                   Suscripción
                 </Button>
