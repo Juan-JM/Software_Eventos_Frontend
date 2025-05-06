@@ -6,62 +6,54 @@ import { useAuth } from '../../contexts/AuthContext';
 import {
   Table, TableBody, TableCell, TableContainer, TableHead, TableRow,
   Paper, Typography, TextField, Button, Box, FormControl, InputLabel,
-  Select, MenuItem, Grid
+  Select, MenuItem, Grid, Menu, IconButton, Tooltip, Snackbar, Alert
 } from '@mui/material';
 import { DatePicker } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import dayjs from 'dayjs';
 import { getAllUsers } from '../../services/user.service';
+import { 
+  generateAuditCsvReport, 
+  generateAuditExcelReport, 
+  generateAuditPdfReport 
+} from '../../services/report.service';
+import GetAppIcon from '@mui/icons-material/GetApp';
+import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
+import TableChartIcon from '@mui/icons-material/TableChart';
+import DescriptionIcon from '@mui/icons-material/Description';
 
 const AuditLogList = () => {
   const { currentUser } = useAuth();
   const navigate = useNavigate();
   const [logs, setLogs] = useState([]);
-  const [users, setUsers] = useState([]); // Nuevo estado para los usuarios
+  const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [userLoading, setUserLoading] = useState(true); // Estado para carga de usuarios
+  const [userLoading, setUserLoading] = useState(true);
   const [filters, setFilters] = useState({
     action: '',
     user_id: '',
     start_date: null,
     end_date: null
   });
+  
+  // Estado para controlar el menú desplegable de exportación
+  const [exportMenuAnchorEl, setExportMenuAnchorEl] = useState(null);
+  const [exportLoading, setExportLoading] = useState(false);
+  
+  // Estado para snackbar de notificaciones
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: '',
+    severity: 'success'
+  });
 
-  // useEffect(() => {
-  //   if (!currentUser || currentUser.user_type !== 'admin') {
-  //     navigate('/unauthorized');
-  //     return;
-  //   }
-
-  //   // Cargar usuarios y logs en paralelo
-  //   const loadData = async () => {
-  //     try {
-  //       setLoading(true);
-  //       setUserLoading(true);
-
-  //       const [usersResponse] = await Promise.all([
-  //         getAllUsers(),
-  //         fetchLogs() // fetchLogs ya se llama aquí
-  //       ]);
-
-  //       setUsers(usersResponse.data);
-  //     } catch (error) {
-  //       console.error('Error loading data:', error);
-  //     } finally {
-  //       setUserLoading(false);
-  //     }
-  //   };
-
-  //   loadData();
-  // }, [currentUser, navigate]);
   useEffect(() => {
     if (!currentUser || !['admin', 'superadmin'].includes(currentUser.user_type)) {
       navigate('/unauthorized');
       return;
     }
   
-    // Cargar usuarios y logs en paralelo
     const loadData = async () => {
       try {
         setLoading(true);
@@ -72,45 +64,40 @@ const AuditLogList = () => {
         if (currentUser.user_type === 'superadmin') {
           usersResponse = await getAllUsers();
         } else {
-          // Obtener solo los usuarios de su empresa (nuevo endpoint o filtro)
           usersResponse = await api.get('/users/', {
-            params: { company: currentUser.company } // asumiendo que el token incluye company
+            params: { company: currentUser.company }
           });
         }
     
         setUsers(usersResponse.data);
-    
-        // Ahora sí, carga los logs
         await fetchLogs();
       } catch (error) {
         console.error('Error loading data:', error);
+        showSnackbar('Error al cargar los datos', 'error');
       } finally {
         setUserLoading(false);
       }
     };
     
-  
     loadData();
   }, [currentUser, navigate]);
   
-
   const fetchLogs = async () => {
     try {
       setLoading(true);
       const params = new URLSearchParams();
       if (filters.action) params.append('action', filters.action);
-      // if (filters.content_type) params.append('content_type', filters.content_type);
-      // En el método fetchLogs del frontend:
       if (filters.user_id) params.append('user_id', filters.user_id);
       if (filters.start_date && dayjs(filters.start_date).isValid())
         params.append('start_date', filters.start_date.format('YYYY-MM-DD'));
       if (filters.end_date && dayjs(filters.end_date).isValid())
-        params.append('end_date', filters.end_date.format('YYYY-MM-DD'));  // const response = await api.get(`/audit/logs/${params.toString() ? '?' + params.toString() : ''}`);
+        params.append('end_date', filters.end_date.format('YYYY-MM-DD'));
 
       const response = await api.get(`/audit/${params.toString() ? '?' + params.toString() : ''}`);
       setLogs(response.data);
     } catch (error) {
       console.error('Error fetching audit logs:', error);
+      showSnackbar('Error al obtener los registros', 'error');
     } finally {
       setLoading(false);
     }
@@ -133,6 +120,72 @@ const AuditLogList = () => {
       user_id: '',
       start_date: null,
       end_date: null
+    });
+  };
+  
+  // Función para mostrar el menú de exportación
+  const handleExportClick = (event) => {
+    setExportMenuAnchorEl(event.currentTarget);
+  };
+  
+  // Función para cerrar el menú de exportación
+  const handleExportClose = () => {
+    setExportMenuAnchorEl(null);
+  };
+  
+  // Función para exportar en un formato específico
+  const handleExport = async (format) => {
+    setExportLoading(true);
+    if (exportMenuAnchorEl) handleExportClose();
+    
+    try {
+      // Preparar los filtros
+      const exportFilters = {
+        action: filters.action || '',
+        user_id: filters.user_id || '',
+        start_date: filters.start_date ? filters.start_date.format('YYYY-MM-DD') : '',
+        end_date: filters.end_date ? filters.end_date.format('YYYY-MM-DD') : ''
+      };
+      
+      // Generar el reporte según el formato
+      let result;
+      switch (format) {
+        case 'csv':
+          result = await generateAuditCsvReport(exportFilters);
+          break;
+        case 'excel':
+          result = await generateAuditExcelReport(exportFilters);
+          break;
+        case 'pdf':
+          result = await generateAuditPdfReport(exportFilters);
+          break;
+        default:
+          throw new Error('Formato no soportado');
+      }
+      
+      showSnackbar(result.message || 'Reporte generado con éxito', 'success');
+    } catch (error) {
+      console.error(`Error exporting to ${format}:`, error);
+      showSnackbar(`Error al exportar a ${format}`, 'error');
+    } finally {
+      setExportLoading(false);
+    }
+  };
+  
+  // Función para mostrar notificaciones
+  const showSnackbar = (message, severity = 'success') => {
+    setSnackbar({
+      open: true,
+      message,
+      severity
+    });
+  };
+  
+  // Función para cerrar el snackbar
+  const handleSnackbarClose = () => {
+    setSnackbar({
+      ...snackbar,
+      open: false
     });
   };
 
@@ -187,6 +240,10 @@ const AuditLogList = () => {
                 <MenuItem value="CREATE">Crear</MenuItem>
                 <MenuItem value="UPDATE">Actualizar</MenuItem>
                 <MenuItem value="DELETE">Eliminar</MenuItem>
+                <MenuItem value="LOGIN">Inicio de sesión</MenuItem>
+                <MenuItem value="LOGOUT">Cierre de sesión</MenuItem>
+                <MenuItem value="VIEW">Visualizar</MenuItem>
+                <MenuItem value="OTHER">Otro</MenuItem>
               </Select>
             </Grid>
             <Grid item xs={12} sm={6} md={3}>
@@ -219,13 +276,14 @@ const AuditLogList = () => {
                     fullWidth: true,
                     size: "small",
                     variant: "outlined",
-                    label: "" // Elimina el label interno del DatePicker
+                    label: ""
                   }
                 }}
               />
             </Grid>
             <Grid item xs={12} sm={6} md={3}>
-              <Typography variant="body2" sx={{ mb: 1 }}>Fecha Fin</Typography>
+              <Typography variant="body2" sx={{ mb: 1 }}>Fecha Fin
+              </Typography>
               <DatePicker
                 value={filters.end_date}
                 onChange={(date) => handleFilterChange('end_date', date)}
@@ -234,32 +292,60 @@ const AuditLogList = () => {
                     fullWidth: true,
                     size: "small",
                     variant: "outlined",
-                    label: "" // Elimina el label interno del DatePicker
+                    label: ""
                   }
                 }}
               />
             </Grid>
-            <Box mt={2} display="flex" justifyContent="flex-end">
-              <Button
-                variant="outlined"
-                color="secondary"
-                onClick={resetFilters}
-                style={{ marginRight: '8px' }}
-              >
-                Limpiar
-              </Button>
-              <Button
-                variant="contained"
-                color="primary"
-                onClick={applyFilters}
-              >
-                Aplicar Filtros
-              </Button>
-            </Box>
+            <Grid item xs={12}>
+              <Box mt={2} display="flex" justifyContent="flex-end">
+                <Button
+                  variant="outlined"
+                  color="secondary"
+                  onClick={resetFilters}
+                  style={{ marginRight: '8px' }}
+                >
+                  Limpiar
+                </Button>
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={applyFilters}
+                  style={{ marginRight: '8px' }}
+                >
+                  Aplicar Filtros
+                </Button>
+                
+                {/* Botones de exportación simples */}
+                <Button
+                  variant="contained" 
+                  color="success"
+                  onClick={() => handleExport('csv')}
+                  style={{ marginRight: '8px' }}
+                >
+                  CSV
+                </Button>
+                <Button
+                  variant="contained"
+                  color="success"
+                  onClick={() => handleExport('excel')}
+                  style={{ marginRight: '8px' }}
+                >
+                  Excel
+                </Button>
+                <Button
+                  variant="contained"
+                  color="success"
+                  onClick={() => handleExport('pdf')}
+                >
+                  PDF
+                </Button>
+              </Box>
+            </Grid>
           </Grid>
         </LocalizationProvider>
-
       </Paper>
+
       {/* Tabla de logs */}
       {loading ? (
         <Typography>Cargando registros...</Typography>
@@ -273,15 +359,14 @@ const AuditLogList = () => {
                 <TableCell>Acción</TableCell>
                 <TableCell>Modelo</TableCell>
                 <TableCell>Objeto</TableCell>
-                <TableCell>Direccion IP</TableCell>
-
+                <TableCell>Dirección IP</TableCell>
                 <TableCell>Cambios</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {logs.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={6} align="center">
+                  <TableCell colSpan={7} align="center">
                     No se encontraron registros.
                   </TableCell>
                 </TableRow>
@@ -302,6 +387,22 @@ const AuditLogList = () => {
           </Table>
         </TableContainer>
       )}
+      
+      {/* Snackbar para notificaciones */}
+      <Snackbar 
+        open={snackbar.open} 
+        autoHideDuration={6000} 
+        onClose={handleSnackbarClose}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+      >
+        <Alert 
+          onClose={handleSnackbarClose} 
+          severity={snackbar.severity} 
+          sx={{ width: '100%' }}
+        >
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </div>
   );
 };
