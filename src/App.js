@@ -38,6 +38,11 @@ import EventList from './components/events/EventList';
 import EventForm from './components/events/EventForm';
 import EventDetail from './components/events/EventDetail';
 
+// Componentes de paquetes 
+import PackageList from './components/packages/PackageList';
+import PackageForm from './components/packages/PackageForm';
+import PackageDetail from './components/packages/PackageDetail';
+
 // Componentes de company
 import CompanyList from './components/companies/CompanyList';
 import CompanyForm from './components/companies/CompanyForm';
@@ -48,6 +53,7 @@ import SubscriptionStatus from './components/subscription/SubscriptionStatus';
 import SubscriptionPlans from './components/subscription/SubscriptionPlans';
 import SubscriptionSuccess from './components/subscription/SubscriptionSuccess';
 import SubscriptionRequired from './components/subscription/SubscriptionRequired';
+
 
 // Página de inicio provisional
 import Dashboard from './components/dashboard/Dashboard';
@@ -114,6 +120,12 @@ function App() {
               <Route path="/services/new" element={<ServiceForm />} />
               <Route path="/services/:id" element={<ServiceDetail />} />
               <Route path="/services/:id/edit" element={<ServiceForm />} />
+              
+              {/* Rutas para Paquetess */}
+              <Route path="/packages" element={<PackageList />} />
+              <Route path="/packages/new" element={<PackageForm />} />
+              <Route path="/packages/:id" element={<PackageDetail />} />
+              <Route path="/packages/:id/edit" element={<PackageForm />} />
 
               {/* Rutas para Locaciones */}
               <Route path="/locations" element={<LocationList />} />
