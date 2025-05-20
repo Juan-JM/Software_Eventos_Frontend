@@ -251,20 +251,22 @@ const PackageForm = () => {
                 fullWidth
                 margin="normal"
               />
-            </Grid>
-            {previewImage && (
-              <Box sx={{ mt: 2, display: 'flex', justifyContent: 'center' }}>
-                <img
-                  src={previewImage}
-                  alt="Vista previa"
-                  style={{ maxWidth: '100%', maxHeight: '300px', borderRadius: '8px' }}
-                  onError={(e) => {
-                    e.target.onerror = null;
-                    e.target.src = 'https://via.placeholder.com/300x200?text=No+Imagen';
-                  }}// Si la URL es inválida, oculta la imagen
-                />
-              </Box>
-            )}
+            </Grid >
+            <Grid item xs={12}>
+              {previewImage && (
+                <Box sx={{ mt: 2, display: 'flex', justifyContent: 'left' }}>
+                  <img
+                    src={previewImage}
+                    alt="Vista previa"
+                    style={{ maxWidth: '100%', maxHeight: '300px', borderRadius: '8px' }}
+                    onError={(e) => {
+                      e.target.onerror = null;
+                      e.target.src = 'https://via.placeholder.com/300x200?text=No+Imagen';
+                    }}// Si la URL es inválida, oculta la imagen
+                  />
+                </Box>
+              )}
+            </Grid >
 
             <Grid item xs={12} sx={{ mt: 2 }}>
               <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2 }}>
