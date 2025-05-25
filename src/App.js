@@ -6,6 +6,10 @@ import { SubscriptionProvider } from './contexts/SubscriptionContext';
 import PrivateRoute from './components/common/PrivateRoute';
 import SubscriptionProtectedRoute from './components/common/SubscriptionProtectedRoute';
 import { setupAxiosInterceptors } from './services/axios-interceptor';
+//nuevo
+import { LocalizationProvider } from '@mui/x-date-pickers';
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
+import { es } from 'date-fns/locale';
 
 // Componentes de autenticación
 import Login from './components/auth/Login';
@@ -37,6 +41,7 @@ import LocationDetail from './components/locations/LocationDetail';
 import EventList from './components/events/EventList';
 import EventForm from './components/events/EventForm';
 import EventDetail from './components/events/EventDetail';
+import EventListByDate from './components/events/EventListByDate.jsx';
 
 // Componentes de company
 import CompanyList from './components/companies/CompanyList';
@@ -54,6 +59,8 @@ import Dashboard from './components/dashboard/Dashboard';
 
 
 import BackupList from './components/backups/BackupList';
+//CALENDAR
+import AgendaCalendar from './components/calendar/AgendaCalendar';
 
 const Unauthorized = () => <div>No tienes permisos para acceder a esta página</div>;
 
@@ -70,6 +77,7 @@ function AxiosInterceptors() {
 
 function App() {
   return (
+    <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={es}>
     <Router>
       <AuthProvider>
         <SubscriptionProvider>
@@ -126,6 +134,10 @@ function App() {
               <Route path="/events/new" element={<EventForm />} />
               <Route path="/events/:id" element={<EventDetail />} />
               <Route path="/events/:id/edit" element={<EventForm />} />
+              <Route path="/events/listado" element={<EventListByDate />} />
+
+              {/* Nueva Ruta para Agenda */}
+              <Route path="/agenda" element={<AgendaCalendar />} />
             </Route>
             
             {/* Rutas básicas para usuarios autenticados */}
@@ -140,6 +152,7 @@ function App() {
         </SubscriptionProvider>
       </AuthProvider>
     </Router>
+    </LocalizationProvider>
   );
 }
 

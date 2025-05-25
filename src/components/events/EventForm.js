@@ -70,15 +70,6 @@ const EventForm = () => {
     loadData();
   }, [id, isEditMode]);
   
-  
-
-  // const handleChange = (e) => {
-  //   const { name, value } = e.target;
-  //   setEvent(prev => ({
-  //     ...prev,
-  //     [name]: value
-  //   }));
-  // };
   const handleChange = (e) => {
     const { name, value } = e.target;
     setEvent(prev => ({
@@ -100,10 +91,39 @@ const EventForm = () => {
     }));
   };
 
+  // const handleSubmit = async (e) => {
+  //   e.preventDefault();
+  //   try {
+  //     setLoading(true);
+  
+  //     const eventData = {
+  //       name: event.name,
+  //       description: event.description,
+  //       start_date: event.start_date,
+  //       end_date: event.end_date,
+  //       location_id: parseInt(event.location),
+  //       service_ids: event.services.map(id => parseInt(id)),
+  //       status: event.status,
+  //       image: event.image
+  //     };
+  
+  //     if (isEditMode) {
+  //       await api.put(`events/${id}/`, eventData);
+  //     } else {
+  //       await api.post('events/', eventData);
+  //     }
+  
+  //     navigate('/events');
+  //   } catch (err) {
+  //     setError('Error al guardar el evento: ' + (err.response?.data?.detail || err.message));
+  //     setLoading(false);
+  //   }
+  // };
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       setLoading(true);
+      setError(null); // Reiniciar errores previos
   
       const eventData = {
         name: event.name,
@@ -123,10 +143,38 @@ const EventForm = () => {
       }
   
       navigate('/events');
-    } catch (err) {
-      setError('Error al guardar el evento: ' + (err.response?.data?.detail || err.message));
-      setLoading(false);
+    // } catch (err) {
+    //   const detail = err.response?.data?.detail;
+    //   const message = typeof detail === 'string'
+    //     ? detail
+    //     : Array.isArray(detail)
+    //       ? detail.join(', ')
+    //       : 'Error desconocido';
+  
+    //   setError(`❌ ${message}`);
+    // } finally {
+    //   setLoading(false);
+    // }
+  } catch (err) {
+    let message = 'Error desconocido';
+  
+    const data = err.response?.data;
+  
+    if (typeof data === 'string') {
+      message = data;
+    } else if (data?.detail) {
+      message = data.detail;
+    } else if (Array.isArray(data)) {
+      message = data.join(', ');
+    } else if (typeof data === 'object') {
+      const values = Object.values(data).flat();
+      message = values.join(', ');
     }
+  
+    setError(`❌ ${message}`);
+    setLoading(false);
+  }
+  
   };
   
 
@@ -144,10 +192,18 @@ const EventForm = () => {
         {isEditMode ? 'Editar Evento' : 'Nuevo Evento'}
       </Typography>
 
-      {error && (
+      {/* {error && (
         <Typography color="error" sx={{ mb: 2 }}>
           {error}
         </Typography>
+      )} */}
+
+      {error && (
+        <Box sx={{ mb: 2, p: 2, bgcolor: '#ffe6e6', border: '1px solid #ff4d4f', borderRadius: '4px' }}>
+          <Typography color="error" fontWeight="bold">
+            {error}
+          </Typography>
+        </Box>
       )}
 
       <Paper elevation={3} sx={{ p: 3 }}>
