@@ -89,6 +89,7 @@ const EventForm = () => {
   }, [id, isEditMode]);
   
   // Manejadores de cambios en campos
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
@@ -123,7 +124,36 @@ const EventForm = () => {
     }
   };
 
+  // const handleSubmit = async (e) => {
+  //   e.preventDefault();
+  //   try {
+  //     setLoading(true);
+  
+  //     const eventData = {
+  //       name: event.name,
+  //       description: event.description,
+  //       start_date: event.start_date,
+  //       end_date: event.end_date,
+  //       location_id: parseInt(event.location),
+  //       service_ids: event.services.map(id => parseInt(id)),
+  //       status: event.status,
+  //       image: event.image
+  //     };
+  
+  //     if (isEditMode) {
+  //       await api.put(`events/${id}/`, eventData);
+  //     } else {
+  //       await api.post('events/', eventData);
+  //     }
+  
+  //     navigate('/events');
+  //   } catch (err) {
+  //     setError('Error al guardar el evento: ' + (err.response?.data?.detail || err.message));
+  //     setLoading(false);
+  //   }
+  // };
   // Validar formulario
+ /*
   const validateForm = () => {
     const newErrors = {};
     
@@ -149,6 +179,7 @@ const EventForm = () => {
   };
   
   // Enviar formulario
+  */
   const handleSubmit = async (e) => {
     e.preventDefault();
     
@@ -156,7 +187,19 @@ const EventForm = () => {
     
     try {
       setLoading(true);
-      
+      setError(null); // Reiniciar errores previos
+  
+      const eventData = {
+        name: event.name,
+        description: event.description,
+        start_date: event.start_date,
+        end_date: event.end_date,
+        location_id: parseInt(event.location),
+        service_ids: event.services.map(id => parseInt(id)),
+        status: event.status,
+        image: event.image
+
+  ]/*    
       const dataToSend = {
         name: formData.name,
         description: formData.description,
@@ -166,6 +209,7 @@ const EventForm = () => {
         is_package: formData.is_package,
         status: formData.status,
         image: formData.image,
+        */}
       };
       
       // Añadir los campos específicos según el tipo de evento
@@ -182,7 +226,33 @@ const EventForm = () => {
       }
       
       navigate('/events');
-    } catch (error) {
+    // } catch (err) {
+    //   const detail = err.response?.data?.detail;
+    //   const message = typeof detail === 'string'
+    //     ? detail
+    //     : Array.isArray(detail)
+    //       ? detail.join(', ')
+    //       : 'Error desconocido';
+  
+    //   setError(`❌ ${message}`);
+    // } finally {
+    //   setLoading(false);
+    // }
+  } catch (err) {
+    let message = 'Error desconocido';
+  
+    const data = err.response?.data;
+  
+    if (typeof data === 'string') {
+      message = data;
+    } else if (data?.detail) {
+      message = data.detail;
+    } else if (Array.isArray(data)) {
+      message = data.join(', ');
+    } else if (typeof data === 'object') {
+      const values = Object.values(data).flat();
+      message = values.join(', ');
+  {/*   } catch (error) {
       console.error('Error al guardar evento:', error);
       
       if (error.response?.data) {
@@ -190,7 +260,13 @@ const EventForm = () => {
       }
     } finally {
       setLoading(false);
+      */}
     }
+  
+    setError(`❌ ${message}`);
+    setLoading(false);
+  }
+  
   };
   
   if (initialLoading) {
@@ -206,12 +282,31 @@ const EventForm = () => {
       <Typography variant="h4" gutterBottom>
         {isEditMode ? 'Editar Evento' : 'Nuevo Evento'}
       </Typography>
+      {/* {error && (
+        <Typography color="error" sx={{ mb: 2 }}>
+          {error}
+        </Typography>
+      )} */}
+
+      {error && (
+        <Box sx={{ mb: 2, p: 2, bgcolor: '#ffe6e6', border: '1px solid #ff4d4f', borderRadius: '4px' }}>
+          <Typography color="error" fontWeight="bold">
+            {error}
+          </Typography>
+        </Box>
+      )}
+
+      <Paper elevation={3} sx={{ p: 3 }}>
+        <form onSubmit={handleSubmit}>
+          <Grid container spacing={2}>
+            <Grid item xs={12}>
       
-      <Paper sx={{ p: 3 }}>
+              {/*      <Paper sx={{ p: 3 }}>
         <Box component="form" onSubmit={handleSubmit}>
           <Grid container spacing={3}>
             {/* Nombre del evento */}
-            <Grid item xs={12} sm={6}>
+         {/*   <Grid item xs={12} sm={6}>
+              */}
               <TextField
                 fullWidth
                 label="Nombre"
