@@ -7,7 +7,7 @@ const BackupList = () => {
 
   const fetchBackups = async () => {
     try {
-      const token = localStorage.getItem("access_token"); //nuevo
+      const token = localStorage.getItem("access_token"); 
       const response = await axios.get(`${baseURL}/backup/`, {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -23,7 +23,7 @@ const BackupList = () => {
     if (!window.confirm("¿Deseas generar un nuevo backup?")) return;
 
     try {
-      const token = localStorage.getItem("access_token"); //nuevo
+      const token = localStorage.getItem("access_token"); 
       await axios.post(`${baseURL}/backup/generate/`, {}, {
         headers: {
           Authorization: `Bearer ${token}`,
