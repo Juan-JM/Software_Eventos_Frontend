@@ -1,94 +1,127 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { 
-  TextField, Button, Box, Typography, MenuItem, FormControl, 
-  Select, InputLabel, CircularProgress, Grid, Paper, Checkbox, 
-  ListItemText, OutlinedInput 
+import {
+  Box, Button, TextField, Typography, FormControl, InputLabel,
+  Select, MenuItem, CircularProgress, FormHelperText,
+  Grid, Paper, Checkbox, FormControlLabel, ListItemText, OutlinedInput
 } from '@mui/material';
+import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
+import es from 'date-fns/locale/es';
 import api from '../../services/api';
+
+const STATUS_OPTIONS = [
+  { value: 'scheduled', label: 'Programado' },
+  { value: 'in_progress', label: 'En curso' },
+  { value: 'completed', label: 'Finalizado' },
+  { value: 'cancelled', label: 'Cancelado' },
+];
 
 const EventForm = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const [locations, setLocations] = useState([]);
-  const [services, setServices] = useState([]);
-  const [previewImage, setPreviewImage] = useState('');
-
-
-  const [event, setEvent] = useState({
+  const isEditMode = Boolean(id);
+  
+  // Estado del formulario
+  const [formData, setFormData] = useState({
     name: '',
     description: '',
-    start_date: '',
-    end_date: '',
-    location: '',
-    services: [],
+    start_date: null,
+    end_date: null,
+    location_id: '',
+    is_package: false, // Nuevo campo para indicar si es un paquete
+    service_ids: [],
+    package_id: '', // Nuevo campo para seleccionar un paquete
     status: 'scheduled',
     image: ''
   });
-
-  const isEditMode = Boolean(id);
-
+  
+  // Estado para opciones de selección
+  const [locations, setLocations] = useState([]);
+  const [services, setServices] = useState([]);
+  const [packages, setPackages] = useState([]); // Nuevo estado para paquetes
+  
+  // Estado para manejo de errores y carga
+  const [errors, setErrors] = useState({});
+  const [loading, setLoading] = useState(false);
+  const [initialLoading, setInitialLoading] = useState(isEditMode);
+  
+  // Cargar datos iniciales
   useEffect(() => {
-    const loadData = async () => {
+    const fetchInitialData = async () => {
       try {
-        setLoading(true);
-  
-        const [locationsRes, servicesRes] = await Promise.all([
+        const [locationsRes, servicesRes, packagesRes] = await Promise.all([
           api.get('locations/'),
-          api.get('services/')
+          api.get('services/'),
+          api.get('packages/') // Cargar paquetes
         ]);
-        setLocations(locationsRes.data.results || locationsRes.data);
-        setServices(servicesRes.data.results || servicesRes.data);
-  
+        
+        setLocations(locationsRes.data);
+        setServices(servicesRes.data);
+        setPackages(packagesRes.data);
+        
         if (isEditMode) {
           const eventRes = await api.get(`events/${id}/`);
-          const data = eventRes.data;
-  
-          setEvent({
-            name: data.name,
-            description: data.description,
-            start_date: data.start_date ? data.start_date.slice(0, 16) : '', // ⚡ cortar segundos para datetime-local
-            end_date: data.end_date ? data.end_date.slice(0, 16) : '',
-            location: data.location?.id || '',
-            services: data.services ? data.services.map(service => service.id) : [],
-            status: data.status,
-            image: data.image || ''
+          const eventData = eventRes.data;
+          
+          setFormData({
+            name: eventData.name || '',
+            description: eventData.description || '',
+            start_date: eventData.start_date ? new Date(eventData.start_date) : null,
+            end_date: eventData.end_date ? new Date(eventData.end_date) : null,
+            location_id: eventData.location?.id || '',
+            is_package: eventData.is_package || false,
+            service_ids: eventData.services?.map(s => s.id) || [],
+            package_id: eventData.package?.id || '',
+            status: eventData.status || 'scheduled',
+            image: eventData.image || ''
           });
-  
-          setPreviewImage(data.image || '');
         }
-  
-      } catch (err) {
-        setError('Error cargando datos: ' + err.message);
+      } catch (error) {
+        console.error('Error al cargar datos iniciales:', error);
       } finally {
-        setLoading(false);
+        setInitialLoading(false);
       }
     };
-  
-    loadData();
+    
+    fetchInitialData();
   }, [id, isEditMode]);
   
+  // Manejadores de cambios en campos
+
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setEvent(prev => ({
-      ...prev,
-      [name]: value
-    }));
-  
-    if (name === 'image') {
-      setPreviewImage(value); // Actualiza la previsualización
+    setFormData(prev => ({ ...prev, [name]: value }));
+    
+    // Limpiar error del campo si existe
+    if (errors[name]) {
+      setErrors(prev => ({ ...prev, [name]: null }));
     }
   };
   
-
-  const handleServicesChange = (e) => {
-    const { value } = e.target;
-    setEvent(prev => ({
+  // Manejador especial para el checkbox is_package
+  const handleIsPackageChange = (e) => {
+    const isPackage = e.target.checked;
+    
+    // Actualizar el estado y limpiar el campo que no se usará
+    setFormData(prev => ({
       ...prev,
-      services: typeof value === 'string' ? value.split(',') : value
+      is_package: isPackage,
+      // Limpiar service_ids si ahora es un paquete
+      service_ids: isPackage ? [] : prev.service_ids,
+      // Limpiar package_id si ahora son servicios
+      package_id: isPackage ? prev.package_id : ''
     }));
+  };
+  
+  // Manejador para cambios en fechas
+  const handleDateChange = (field, date) => {
+    setFormData(prev => ({ ...prev, [field]: date }));
+    
+    if (errors[field]) {
+      setErrors(prev => ({ ...prev, [field]: null }));
+    }
   };
 
   // const handleSubmit = async (e) => {
@@ -119,8 +152,39 @@ const EventForm = () => {
   //     setLoading(false);
   //   }
   // };
+  // Validar formulario
+ /*
+  const validateForm = () => {
+    const newErrors = {};
+    
+    if (!formData.name) newErrors.name = 'El nombre es obligatorio';
+    if (!formData.description) newErrors.description = 'La descripción es obligatoria';
+    if (!formData.start_date) newErrors.start_date = 'La fecha de inicio es obligatoria';
+    if (!formData.end_date) newErrors.end_date = 'La fecha de fin es obligatoria';
+    if (!formData.location_id) newErrors.location_id = 'La locación es obligatoria';
+    
+    // Validaciones específicas según is_package
+    if (formData.is_package) {
+      if (!formData.package_id) newErrors.package_id = 'Debe seleccionar un paquete';
+    } else {
+      if (!formData.service_ids.length) newErrors.service_ids = 'Debe seleccionar al menos un servicio';
+    }
+    
+    if (formData.start_date && formData.end_date && formData.start_date > formData.end_date) {
+      newErrors.end_date = 'La fecha de fin debe ser posterior a la fecha de inicio';
+    }
+    
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+  
+  // Enviar formulario
+  */
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    if (!validateForm()) return;
+    
     try {
       setLoading(true);
       setError(null); // Reiniciar errores previos
@@ -134,14 +198,33 @@ const EventForm = () => {
         service_ids: event.services.map(id => parseInt(id)),
         status: event.status,
         image: event.image
+
+  ]/*    
+      const dataToSend = {
+        name: formData.name,
+        description: formData.description,
+        start_date: formData.start_date?.toISOString(),
+        end_date: formData.end_date?.toISOString(),
+        location_id: formData.location_id,
+        is_package: formData.is_package,
+        status: formData.status,
+        image: formData.image,
+        */}
       };
-  
-      if (isEditMode) {
-        await api.put(`events/${id}/`, eventData);
+      
+      // Añadir los campos específicos según el tipo de evento
+      if (formData.is_package) {
+        dataToSend.package_id = formData.package_id;
       } else {
-        await api.post('events/', eventData);
+        dataToSend.service_ids = formData.service_ids;
       }
-  
+      
+      if (isEditMode) {
+        await api.put(`events/${id}/`, dataToSend);
+      } else {
+        await api.post('events/', dataToSend);
+      }
+      
       navigate('/events');
     // } catch (err) {
     //   const detail = err.response?.data?.detail;
@@ -169,6 +252,15 @@ const EventForm = () => {
     } else if (typeof data === 'object') {
       const values = Object.values(data).flat();
       message = values.join(', ');
+  {/*   } catch (error) {
+      console.error('Error al guardar evento:', error);
+      
+      if (error.response?.data) {
+        setErrors(prev => ({ ...prev, ...error.response.data }));
+      }
+    } finally {
+      setLoading(false);
+      */}
     }
   
     setError(`❌ ${message}`);
@@ -177,21 +269,19 @@ const EventForm = () => {
   
   };
   
-
-  if (loading && isEditMode) {
+  if (initialLoading) {
     return (
       <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
         <CircularProgress />
       </Box>
     );
   }
-
+  
   return (
     <Box sx={{ p: 3 }}>
-      <Typography variant="h4" sx={{ mb: 3 }}>
+      <Typography variant="h4" gutterBottom>
         {isEditMode ? 'Editar Evento' : 'Nuevo Evento'}
       </Typography>
-
       {/* {error && (
         <Typography color="error" sx={{ mb: 2 }}>
           {error}
@@ -210,171 +300,211 @@ const EventForm = () => {
         <form onSubmit={handleSubmit}>
           <Grid container spacing={2}>
             <Grid item xs={12}>
+      
+              {/*      <Paper sx={{ p: 3 }}>
+        <Box component="form" onSubmit={handleSubmit}>
+          <Grid container spacing={3}>
+            {/* Nombre del evento */}
+         {/*   <Grid item xs={12} sm={6}>
+              */}
               <TextField
-                label="Nombre del evento"
-                name="name"
-                value={event.name}
-                onChange={handleChange}
                 fullWidth
+                label="Nombre"
+                name="name"
+                value={formData.name}
+                onChange={handleChange}
+                error={Boolean(errors.name)}
+                helperText={errors.name}
                 required
-                margin="normal"
               />
             </Grid>
-
+            
+            {/* Selección de locación */}
+            <Grid item xs={12} sm={6}>
+              <FormControl fullWidth error={Boolean(errors.location_id)} required>
+                <InputLabel>Locación</InputLabel>
+                <Select
+                  name="location_id"
+                  value={formData.location_id}
+                  onChange={handleChange}
+                  label="Locación"
+                >
+                  {locations.map(location => (
+                    <MenuItem key={location.id} value={location.id}>
+                      {location.name}
+                    </MenuItem>
+                  ))}
+                </Select>
+                {errors.location_id && <FormHelperText>{errors.location_id}</FormHelperText>}
+              </FormControl>
+            </Grid>
+            
+            {/* Descripción del evento */}
             <Grid item xs={12}>
               <TextField
+                fullWidth
                 label="Descripción"
                 name="description"
-                value={event.description}
+                value={formData.description}
                 onChange={handleChange}
-                fullWidth
+                error={Boolean(errors.description)}
+                helperText={errors.description}
                 multiline
                 rows={4}
-                margin="normal"
-              />
-            </Grid>
-
-            <Grid item xs={12} md={6}>
-              <TextField
-                label="Fecha de inicio"
-                name="start_date"
-                type="datetime-local"
-                value={event.start_date}
-                onChange={handleChange}
-                fullWidth
                 required
-                margin="normal"
-                InputLabelProps={{
-                  shrink: true,
-                }}
               />
             </Grid>
-
-            <Grid item xs={12} md={6}>
-              <TextField
-                label="Fecha de fin"
-                name="end_date"
-                type="datetime-local"
-                value={event.end_date}
-                onChange={handleChange}
-                fullWidth
-                required
-                margin="normal"
-                InputLabelProps={{
-                  shrink: true,
-                }}
-              />
+            
+            {/* Selección de fecha de inicio */}
+            <Grid item xs={12} sm={6}>
+              <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={es}>
+                <DateTimePicker
+                  label="Fecha de inicio"
+                  value={formData.start_date}
+                  onChange={(date) => handleDateChange('start_date', date)}
+                  slotProps={{
+                    textField: {
+                      fullWidth: true,
+                      required: true,
+                      error: Boolean(errors.start_date),
+                      helperText: errors.start_date
+                    }
+                  }}
+                />
+              </LocalizationProvider>
             </Grid>
-
-            <Grid item xs={12} md={6}>
-            <FormControl fullWidth margin="normal">
-              <InputLabel id="location-label">Locación</InputLabel>
-              <Select
-                labelId="location-label"
-                name="location"
-                value={event.location}
-                onChange={handleChange}
-                label="Locación"
-                fullWidth 
-              >
-                {locations.map(loc => (
-                  <MenuItem key={loc.id} value={loc.id}>
-                    {loc.name}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
+            
+            {/* Selección de fecha de fin */}
+            <Grid item xs={12} sm={6}>
+              <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={es}>
+                <DateTimePicker
+                  label="Fecha de fin"
+                  value={formData.end_date}
+                  onChange={(date) => handleDateChange('end_date', date)}
+                  slotProps={{
+                    textField: {
+                      fullWidth: true,
+                      required: true,
+                      error: Boolean(errors.end_date),
+                      helperText: errors.end_date
+                    }
+                  }}
+                />
+              </LocalizationProvider>
             </Grid>
-
-            <Grid item xs={12} md={6}>
-            <FormControl fullWidth margin="normal">
-              <InputLabel id="services-label">Servicios</InputLabel>
-              <Select
-                labelId="services-label"
-                multiple
-                name="services"
-                value={event.services}
-                onChange={handleServicesChange}
-                input={<OutlinedInput label="Servicios" />}
-                renderValue={(selected) => 
-                  services
-                    .filter(service => selected.includes(service.id))
-                    .map(service => service.name)
-                    .join(', ')
-                }
-                fullWidth 
-              >
-                {services.map(service => (
-                  <MenuItem key={service.id} value={service.id}>
-                    <Checkbox checked={event.services.indexOf(service.id) > -1} />
-                    <ListItemText primary={service.name} />
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-            </Grid>
-
-            <Grid item xs={12} md={6}>
-              <FormControl fullWidth margin="normal">
+            
+            {/* Estado del evento */}
+            <Grid item xs={12} sm={6}>
+              <FormControl fullWidth>
                 <InputLabel>Estado</InputLabel>
                 <Select
                   name="status"
-                  value={event.status}
+                  value={formData.status}
                   onChange={handleChange}
                   label="Estado"
                 >
-                  <MenuItem value="scheduled">Programado</MenuItem>
-                  <MenuItem value="in_progress">En curso</MenuItem>
-                  <MenuItem value="completed">Finalizado</MenuItem>
-                  <MenuItem value="cancelled">Cancelado</MenuItem>
+                  {STATUS_OPTIONS.map(option => (
+                    <MenuItem key={option.value} value={option.value}>
+                      {option.label}
+                    </MenuItem>
+                  ))}
                 </Select>
               </FormControl>
             </Grid>
-
-            <Grid item xs={12}>
+            
+            {/* URL de la imagen */}
+            <Grid item xs={12} sm={6}>
               <TextField
-                label="URL de la Imagen"
-                name="image"
-                value={event.image || ''}
-                onChange={handleChange}
                 fullWidth
-                margin="normal"
+                label="URL de la imagen"
+                name="image"
+                value={formData.image}
+                onChange={handleChange}
+                placeholder="https://ejemplo.com/imagen.jpg"
               />
             </Grid>
-            {previewImage && (
-              <Box sx={{ mt: 2, display: 'flex', justifyContent: 'center' }}>
-                <img 
-                  src={previewImage} 
-                  alt="Vista previa" 
-                  style={{ maxWidth: '100%', maxHeight: '300px', borderRadius: '8px' }}
-                  onError={(e) => {
-                    e.target.onerror = null; 
-                    e.target.src = 'https://via.placeholder.com/300x200?text=No+Imagen'; 
-                  }}// Si la URL es inválida, oculta la imagen
-                />
-              </Box>
-            )}
-
-            <Grid item xs={12} sx={{ mt: 2 }}>
-              <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2 }}>
-                <Button 
-                  variant="outlined" 
-                  onClick={() => navigate('/events')}
-                >
-                  Cancelar
-                </Button>
-                <Button 
-                  type="submit" 
-                  variant="contained" 
-                  color="primary"
-                  disabled={loading}
-                >
-                  {loading ? <CircularProgress size={24} /> : isEditMode ? 'Actualizar' : 'Guardar'}
-                </Button>
-              </Box>
+            
+            {/* Tipo de servicio: Paquete o Servicios individuales */}
+            <Grid item xs={12}>
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={formData.is_package}
+                    onChange={handleIsPackageChange}
+                    name="is_package"
+                  />
+                }
+                label="Usar paquete de servicios"
+              />
+            </Grid>
+            
+            {/* Selector condicional: Paquete o Servicios individuales */}
+            <Grid item xs={12}>
+              {formData.is_package ? (
+                <FormControl fullWidth error={Boolean(errors.package_id)} required>
+                  <InputLabel>Paquete de servicios</InputLabel>
+                  <Select
+                    name="package_id"
+                    value={formData.package_id}
+                    onChange={handleChange}
+                    label="Paquete de servicios"
+                  >
+                    {packages.map(pkg => (
+                      <MenuItem key={pkg.id} value={pkg.id}>
+                        {pkg.name}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                  {errors.package_id && <FormHelperText>{errors.package_id}</FormHelperText>}
+                </FormControl>
+              ) : (
+                <FormControl fullWidth error={Boolean(errors.service_ids)} required>
+                  <InputLabel>Servicios</InputLabel>
+                  <Select
+                    multiple
+                    name="service_ids"
+                    value={formData.service_ids}
+                    onChange={handleChange}
+                    input={<OutlinedInput label="Servicios" />}
+                    renderValue={(selected) => {
+                      const selectedNames = services
+                        .filter(service => selected.includes(service.id))
+                        .map(service => service.name);
+                      return selectedNames.join(', ');
+                    }}
+                  >
+                    {services.map(service => (
+                      <MenuItem key={service.id} value={service.id}>
+                        <Checkbox checked={formData.service_ids.indexOf(service.id) > -1} />
+                        <ListItemText primary={service.name} />
+                      </MenuItem>
+                    ))}
+                  </Select>
+                  {errors.service_ids && <FormHelperText>{errors.service_ids}</FormHelperText>}
+                </FormControl>
+              )}
+            </Grid>
+            
+            {/* Botones de acción */}
+            <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2, mt: 3 }}>
+              <Button
+                variant="outlined"
+                onClick={() => navigate('/events')}
+                disabled={loading}
+              >
+                Cancelar
+              </Button>
+              <Button
+                type="submit"
+                variant="contained"
+                color="primary"
+                disabled={loading}
+              >
+                {loading ? <CircularProgress size={24} /> : (isEditMode ? 'Actualizar' : 'Crear')}
+              </Button>
             </Grid>
           </Grid>
-        </form>
+        </Box>
       </Paper>
     </Box>
   );
