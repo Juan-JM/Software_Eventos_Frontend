@@ -5,11 +5,12 @@ import { AuthProvider } from './contexts/AuthContext';
 import { SubscriptionProvider } from './contexts/SubscriptionContext';
 import PrivateRoute from './components/common/PrivateRoute';
 import SubscriptionProtectedRoute from './components/common/SubscriptionProtectedRoute';
+//yebara comento
 import { setupAxiosInterceptors } from './services/axios-interceptor';
-//nuevo
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { es } from 'date-fns/locale';
+//yebara comento
 
 // Componentes de autenticación
 import Login from './components/auth/Login';
@@ -53,16 +54,24 @@ import CompanyList from './components/companies/CompanyList';
 import CompanyForm from './components/companies/CompanyForm';
 import CompanyDetail from './components/companies/CompanyDetail';
 
-// Componentes de suscripción
-import SubscriptionStatus from './components/subscription/SubscriptionStatus';
-import SubscriptionPlans from './components/subscription/SubscriptionPlans';
-import SubscriptionSuccess from './components/subscription/SubscriptionSuccess';
-import SubscriptionRequired from './components/subscription/SubscriptionRequired';
+// Componentes de personal
+import StaffList from './components/staff/StaffList';
+import StaffForm from './components/staff/StaffForm';
+import StaffDetail from './components/staff/StaffDetail';
 
+// Componentes de tareas
+import TaskList from './components/tasks/TaskList';
+import TaskForm from './components/tasks/TaskForm';
+import TaskDetail from './components/tasks/TaskDetail';
+
+// Componentes de suscripción - COMENTADOS HASTA QUE LOS CREES
+// import SubscriptionStatus from './components/subscription/SubscriptionStatus';
+// import SubscriptionPlans from './components/subscription/SubscriptionPlans';
+// import SubscriptionSuccess from './components/subscription/SubscriptionSuccess';
+// import SubscriptionRequired from './components/subscription/SubscriptionRequired';
 
 // Página de inicio provisional
 import Dashboard from './components/dashboard/Dashboard';
-
 
 import BackupList from './components/backups/BackupList';
 //CALENDAR
@@ -70,12 +79,15 @@ import AgendaCalendar from './components/calendar/AgendaCalendar';
 
 const Unauthorized = () => <div>No tienes permisos para acceder a esta página</div>;
 
+// Componente temporal para suscripción
+const TemporarySubscription = () => <div>Página de suscripción - Por implementar</div>;
+
 // Componente para configurar los interceptores
 function AxiosInterceptors() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    setupAxiosInterceptors(navigate);
+    // setupAxiosInterceptors(navigate); // Comentado hasta que tengas el archivo
   }, [navigate]);
 
   return null;
@@ -96,12 +108,12 @@ function App() {
             <Route path="/logout" element={<Logout />} />
             <Route path="/unauthorized" element={<Unauthorized />} />
           
-            {/* Rutas de suscripción */}
+            {/* Rutas de suscripción - TEMPORALES */}
             <Route element={<PrivateRoute allowedRoles={['admin', 'staff', 'superadmin']} />}>
-              <Route path="/subscription" element={<SubscriptionStatus />} />
-              <Route path="/subscription/plans" element={<SubscriptionPlans />} />
-              <Route path="/subscription/success" element={<SubscriptionSuccess />} />
-              <Route path="/subscription/required" element={<SubscriptionRequired />} />
+              <Route path="/subscription" element={<TemporarySubscription />} />
+              <Route path="/subscription/plans" element={<TemporarySubscription />} />
+              <Route path="/subscription/success" element={<TemporarySubscription />} />
+              <Route path="/subscription/required" element={<TemporarySubscription />} />
             </Route>
 
             {/* Rutas privadas - Admin y Superadmin */} 
@@ -110,7 +122,7 @@ function App() {
               <Route path="/users/new" element={<UserForm />} />
               <Route path="/users/:id" element={<UserDetail />} />
               <Route path="/audit-logs" element={<AuditLogList />} />
-              <Route path="/backups" element={< BackupList />} /> 
+              <Route path="/backups" element={<BackupList />} /> 
             </Route>
 
             {/* Rutas privadas - Solo Superadmin */}
@@ -129,7 +141,7 @@ function App() {
               <Route path="/services/:id" element={<ServiceDetail />} />
               <Route path="/services/:id/edit" element={<ServiceForm />} />
               
-              {/* Rutas para Paquetess */}
+              {/* Rutas para Paquetes */}
               <Route path="/packages" element={<PackageList />} />
               <Route path="/packages/new" element={<PackageForm />} />
               <Route path="/packages/:id" element={<PackageDetail />} />
@@ -150,6 +162,22 @@ function App() {
 
               {/* Nueva Ruta para Agenda */}
               <Route path="/agenda" element={<AgendaCalendar />} />
+            </Route>
+
+            {/* Rutas para Personal - Solo Admin con suscripción */}
+            <Route element={<SubscriptionProtectedRoute allowedRoles={['admin']} />}>
+              <Route path="/staff" element={<StaffList />} />
+              <Route path="/staff/new" element={<StaffForm />} />
+              <Route path="/staff/:id" element={<StaffDetail />} />
+              <Route path="/staff/:id/edit" element={<StaffForm />} />
+            </Route>
+
+            {/* Rutas para Tareas - Admin y Staff con suscripción */}
+            <Route element={<SubscriptionProtectedRoute allowedRoles={['admin', 'staff']} />}>
+              <Route path="/tasks" element={<TaskList />} />
+              <Route path="/tasks/new" element={<TaskForm />} />
+              <Route path="/tasks/:id" element={<TaskDetail />} />
+              <Route path="/tasks/:id/edit" element={<TaskForm />} />
             </Route>
             
             {/* Rutas básicas para usuarios autenticados */}

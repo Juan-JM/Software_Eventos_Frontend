@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
+import { useSubscription } from '../../contexts/SubscriptionContext';
 import {
   AppBar, Toolbar, Typography, Button, IconButton,
   Menu, MenuItem, Divider
@@ -10,6 +11,7 @@ import { logout } from '../../services/auth.service';
 
 const Navbar = () => {
   const { currentUser, setCurrentUser } = useAuth();
+  const { hasSubscriptionAccess } = useSubscription();
   const navigate = useNavigate();
   const [anchorEl, setAnchorEl] = React.useState(null);
 
@@ -31,7 +33,7 @@ const Navbar = () => {
     }
   };
 
-  // const isAdminOrStaff = currentUser && (currentUser.user_type === 'admin' || currentUser.user_type === 'staff');
+  const canAccessSubscriptionFeatures = hasSubscriptionAccess();
 
   return (
     <AppBar position="static">
@@ -58,6 +60,9 @@ const Navbar = () => {
                 <Button color="inherit" component={RouterLink} to="/audit-logs">
                   Bitácora
                 </Button>
+                <Button color="inherit" component={RouterLink} to="/backups">
+                  Backups
+                </Button>
               </>
             )}
 
@@ -73,24 +78,55 @@ const Navbar = () => {
                 <Button color="inherit" component={RouterLink} to="/subscription">
                   Suscripción
                 </Button>
-                <Button color="inherit" component={RouterLink} to="/users">
-                  Usuarios
-                </Button>
-                <Button color="inherit" component={RouterLink} to="/services">
-                  Servicios
-                </Button>
-                <Button color="inherit" component={RouterLink} to="/packages">
-                  Paquetes
-                </Button>
-                <Button color="inherit" component={RouterLink} to="/locations">
-                  Locaciones
-                </Button>
-                <Button color="inherit" component={RouterLink} to="/events">
-                  Eventos
-                </Button>
-                <Button color="inherit" component={RouterLink} to="/audit-logs">
-                  Bitácora
-                </Button>
+                
+                {/* Solo admins pueden ver usuarios */}
+                {currentUser.user_type === 'admin' && (
+                  <Button color="inherit" component={RouterLink} to="/users">
+                    Usuarios
+                  </Button>
+                )}
+
+                {/* Funcionalidades que requieren suscripción activa */}
+                {canAccessSubscriptionFeatures && (
+                  <>
+                    <Button color="inherit" component={RouterLink} to="/services">
+                      Servicios
+                    </Button>
+                    <Button color="inherit" component={RouterLink} to="/packages">
+                      Paquetes
+                    </Button>
+                    <Button color="inherit" component={RouterLink} to="/locations">
+                      Locaciones
+                    </Button>
+                    <Button color="inherit" component={RouterLink} to="/events">
+                      Eventos
+                    </Button>
+                    
+                    {/* PERSONAL - Solo Admin */}
+                    {currentUser.user_type === 'admin' && (
+                      <Button color="inherit" component={RouterLink} to="/staff">
+                        Personal
+                      </Button>
+                    )}
+                    
+                    {/* TAREAS - Admin y Staff */}
+                    <Button color="inherit" component={RouterLink} to="/tasks">
+                      Tareas
+                    </Button>
+                  </>
+                )}
+
+                {/* Solo admins pueden ver bitácora y backups */}
+                {currentUser.user_type === 'admin' && (
+                  <>
+                    <Button color="inherit" component={RouterLink} to="/audit-logs">
+                      Bitácora
+                    </Button>
+                    <Button color="inherit" component={RouterLink} to="/backups">
+                      Backups
+                    </Button>
+                  </>
+                )}
               </>
             )}
 
@@ -121,7 +157,7 @@ const Navbar = () => {
                 handleClose();
                 navigate('/profile');
               }}>
-                Mi Perfil
+                Mi Perfil ({currentUser.user_type})
               </MenuItem>
               <Divider />
               <MenuItem onClick={() => {
