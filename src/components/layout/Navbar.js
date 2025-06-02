@@ -78,6 +78,30 @@ const Navbar = () => {
                 <Button color="inherit" component={RouterLink} to="/subscription">
                   Suscripción
                 </Button>
+/*
+                <Button color="inherit" component={RouterLink} to="/users">
+                  Usuarios
+                </Button>
+                <Button color="inherit" component={RouterLink} to="/services">
+                  Servicios
+                </Button>
+                <Button color="inherit" component={RouterLink} to="/packages">
+                  Paquetes
+                </Button>
+                <Button color="inherit" component={RouterLink} to="/locations">
+                  Locaciones
+                </Button>
+                <Button color="inherit" component={RouterLink} to="/events">
+                  Eventos
+                </Button>
+                <Button color="inherit" component={RouterLink} to="/audit-logs">
+                  Bitácora
+                </Button>
+                <Button color="inherit" component={RouterLink} to="/sales">
+                  Nota de Venta
+                </Button>
+*/
+
                 
                 {/* Solo admins pueden ver usuarios */}
                 {currentUser.user_type === 'admin' && (

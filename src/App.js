@@ -59,6 +59,8 @@ import StaffList from './components/staff/StaffList';
 import StaffForm from './components/staff/StaffForm';
 import StaffDetail from './components/staff/StaffDetail';
 
+// Nota de venta
+import NotaVentaForm from './components/sales/SalesNote';
 // Componentes de tareas
 import TaskList from './components/tasks/TaskList';
 import TaskForm from './components/tasks/TaskForm';
@@ -122,7 +124,9 @@ function App() {
               <Route path="/users/new" element={<UserForm />} />
               <Route path="/users/:id" element={<UserDetail />} />
               <Route path="/audit-logs" element={<AuditLogList />} />
-              <Route path="/backups" element={<BackupList />} /> 
+              <Route path="/backups" element={< BackupList />} /> 
+              <Route path="/sales" element={ < NotaVentaForm />} /> 
+
             </Route>
 
             {/* Rutas privadas - Solo Superadmin */}
@@ -139,7 +143,7 @@ function App() {
               <Route path="/services" element={<ServiceList />} />
               <Route path="/services/new" element={<ServiceForm />} />
               <Route path="/services/:id" element={<ServiceDetail />} />
-              <Route path="/services/:id/edit" element={<ServiceForm />} />
+              <Route path="/services/:id/edit" element={<ServiceForm />} /> 
               
               {/* Rutas para Paquetes */}
               <Route path="/packages" element={<PackageList />} />
