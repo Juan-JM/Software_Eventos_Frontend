@@ -54,6 +54,8 @@ import SubscriptionPlans from './components/subscription/SubscriptionPlans';
 import SubscriptionSuccess from './components/subscription/SubscriptionSuccess';
 import SubscriptionRequired from './components/subscription/SubscriptionRequired';
 
+// Nota de venta
+import NotaVentaForm from './components/sales/SalesNote';
 
 // Página de inicio provisional
 import Dashboard from './components/dashboard/Dashboard';
@@ -103,6 +105,7 @@ function App() {
               <Route path="/users/:id" element={<UserDetail />} />
               <Route path="/audit-logs" element={<AuditLogList />} />
               <Route path="/backups" element={< BackupList />} /> 
+              <Route path="/sales" element={ < NotaVentaForm />} /> 
             </Route>
 
             {/* Rutas privadas - Solo Superadmin */}
@@ -119,7 +122,7 @@ function App() {
               <Route path="/services" element={<ServiceList />} />
               <Route path="/services/new" element={<ServiceForm />} />
               <Route path="/services/:id" element={<ServiceDetail />} />
-              <Route path="/services/:id/edit" element={<ServiceForm />} />
+              <Route path="/services/:id/edit" element={<ServiceForm />} /> 
               
               {/* Rutas para Paquetess */}
               <Route path="/packages" element={<PackageList />} />
