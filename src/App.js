@@ -54,6 +54,11 @@ import CompanyList from './components/companies/CompanyList';
 import CompanyForm from './components/companies/CompanyForm';
 import CompanyDetail from './components/companies/CompanyDetail';
 
+// Componentes de cronogramas
+import ScheduleList from './components/schedules/ScheduleList';
+import ScheduleForm from './components/schedules/ScheduleForm';
+import ScheduleDetail from './components/schedules/ScheduleDetail';
+
 // Componentes de personal
 import StaffList from './components/staff/StaffList';
 import StaffForm from './components/staff/StaffForm';
@@ -160,6 +165,12 @@ function App() {
                 <Route path="/events/:id" element={<EventDetail />} />
                 <Route path="/events/:id/edit" element={<EventForm />} />
                 <Route path="/events/listado" element={<EventListByDate />} />
+
+                {/* Rutas para Cronogramas - NUEVAS RUTAS */}
+                <Route path="/schedules" element={<ScheduleList />} />
+                <Route path="/schedules/new" element={<ScheduleForm />} />
+                <Route path="/schedules/:id" element={<ScheduleDetail />} />
+                <Route path="/schedules/:id/edit" element={<ScheduleForm />} />
 
                 {/* Nueva Ruta para Agenda */}
                 <Route path="/agenda" element={<AgendaCalendar />} />
