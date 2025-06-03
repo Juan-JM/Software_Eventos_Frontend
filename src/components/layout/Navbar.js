@@ -75,12 +75,15 @@ const Navbar = () => {
                 <Button color="inherit" component={RouterLink} to="/subscription">
                   Suscripción
                 </Button>
-                <Button color="inherit" component={RouterLink} to="/sales">
+                <Button color="inherit" component={RouterLink} to="/sales-note">
                   Nota de Venta
                 </Button>
-                <Button color="inherit" component={RouterLink} to="/notas-ventas">
+                {/* <Button color="inherit" component={RouterLink} to="/sales">
+                  Nota de Venta
+                </Button> */}
+                {/* <Button color="inherit" component={RouterLink} to="/notas-ventas">
                   Notas de  Ventas
-                </Button>
+                </Button> */}
                 {/* 
                 <Button color="inherit" component={RouterLink} to="/users">
                   Usuarios
