@@ -22,7 +22,7 @@ const EventForm = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const isEditMode = Boolean(id);
-  
+
   // Estado del formulario
   const [formData, setFormData] = useState({
     name: '',
@@ -36,17 +36,17 @@ const EventForm = () => {
     status: 'scheduled',
     image: ''
   });
-  
+
   // Estado para opciones de selección
   const [locations, setLocations] = useState([]);
   const [services, setServices] = useState([]);
   const [packages, setPackages] = useState([]); // Nuevo estado para paquetes
-  
+
   // Estado para manejo de errores y carga
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
   const [initialLoading, setInitialLoading] = useState(isEditMode);
-  
+
   // Cargar datos iniciales
   useEffect(() => {
     const fetchInitialData = async () => {
@@ -56,15 +56,15 @@ const EventForm = () => {
           api.get('services/'),
           api.get('packages/') // Cargar paquetes
         ]);
-        
+
         setLocations(locationsRes.data);
         setServices(servicesRes.data);
         setPackages(packagesRes.data);
-        
+
         if (isEditMode) {
           const eventRes = await api.get(`events/${id}/`);
           const eventData = eventRes.data;
-          
+
           setFormData({
             name: eventData.name || '',
             description: eventData.description || '',
@@ -84,26 +84,25 @@ const EventForm = () => {
         setInitialLoading(false);
       }
     };
-    
+
     fetchInitialData();
   }, [id, isEditMode]);
-  
-  // Manejadores de cambios en campos
 
+  // Manejadores de cambios en campos
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
-    
+
     // Limpiar error del campo si existe
     if (errors[name]) {
       setErrors(prev => ({ ...prev, [name]: null }));
     }
   };
-  
+
   // Manejador especial para el checkbox is_package
   const handleIsPackageChange = (e) => {
     const isPackage = e.target.checked;
-    
+
     // Actualizar el estado y limpiar el campo que no se usará
     setFormData(prev => ({
       ...prev,
@@ -114,92 +113,50 @@ const EventForm = () => {
       package_id: isPackage ? prev.package_id : ''
     }));
   };
-  
+
   // Manejador para cambios en fechas
   const handleDateChange = (field, date) => {
     setFormData(prev => ({ ...prev, [field]: date }));
-    
+
     if (errors[field]) {
       setErrors(prev => ({ ...prev, [field]: null }));
     }
   };
 
-  // const handleSubmit = async (e) => {
-  //   e.preventDefault();
-  //   try {
-  //     setLoading(true);
-  
-  //     const eventData = {
-  //       name: event.name,
-  //       description: event.description,
-  //       start_date: event.start_date,
-  //       end_date: event.end_date,
-  //       location_id: parseInt(event.location),
-  //       service_ids: event.services.map(id => parseInt(id)),
-  //       status: event.status,
-  //       image: event.image
-  //     };
-  
-  //     if (isEditMode) {
-  //       await api.put(`events/${id}/`, eventData);
-  //     } else {
-  //       await api.post('events/', eventData);
-  //     }
-  
-  //     navigate('/events');
-  //   } catch (err) {
-  //     setError('Error al guardar el evento: ' + (err.response?.data?.detail || err.message));
-  //     setLoading(false);
-  //   }
-  // };
   // Validar formulario
- /*
   const validateForm = () => {
     const newErrors = {};
-    
+
     if (!formData.name) newErrors.name = 'El nombre es obligatorio';
     if (!formData.description) newErrors.description = 'La descripción es obligatoria';
     if (!formData.start_date) newErrors.start_date = 'La fecha de inicio es obligatoria';
     if (!formData.end_date) newErrors.end_date = 'La fecha de fin es obligatoria';
     if (!formData.location_id) newErrors.location_id = 'La locación es obligatoria';
-    
+
     // Validaciones específicas según is_package
     if (formData.is_package) {
       if (!formData.package_id) newErrors.package_id = 'Debe seleccionar un paquete';
     } else {
       if (!formData.service_ids.length) newErrors.service_ids = 'Debe seleccionar al menos un servicio';
     }
-    
+
     if (formData.start_date && formData.end_date && formData.start_date > formData.end_date) {
       newErrors.end_date = 'La fecha de fin debe ser posterior a la fecha de inicio';
     }
-    
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
-  
+
   // Enviar formulario
-  */
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!validateForm()) return;
-    
+
     try {
       setLoading(true);
-      setError(null); // Reiniciar errores previos
-  
-      const eventData = {
-        name: event.name,
-        description: event.description,
-        start_date: event.start_date,
-        end_date: event.end_date,
-        location_id: parseInt(event.location),
-        service_ids: event.services.map(id => parseInt(id)),
-        status: event.status,
-        image: event.image
 
-  ]/*    
       const dataToSend = {
         name: formData.name,
         description: formData.description,
@@ -209,66 +166,33 @@ const EventForm = () => {
         is_package: formData.is_package,
         status: formData.status,
         image: formData.image,
-        */}
       };
-      
+
       // Añadir los campos específicos según el tipo de evento
       if (formData.is_package) {
         dataToSend.package_id = formData.package_id;
       } else {
         dataToSend.service_ids = formData.service_ids;
       }
-      
+
       if (isEditMode) {
         await api.put(`events/${id}/`, dataToSend);
       } else {
         await api.post('events/', dataToSend);
       }
-      
+
       navigate('/events');
-    // } catch (err) {
-    //   const detail = err.response?.data?.detail;
-    //   const message = typeof detail === 'string'
-    //     ? detail
-    //     : Array.isArray(detail)
-    //       ? detail.join(', ')
-    //       : 'Error desconocido';
-  
-    //   setError(`❌ ${message}`);
-    // } finally {
-    //   setLoading(false);
-    // }
-  } catch (err) {
-    let message = 'Error desconocido';
-  
-    const data = err.response?.data;
-  
-    if (typeof data === 'string') {
-      message = data;
-    } else if (data?.detail) {
-      message = data.detail;
-    } else if (Array.isArray(data)) {
-      message = data.join(', ');
-    } else if (typeof data === 'object') {
-      const values = Object.values(data).flat();
-      message = values.join(', ');
-  {/*   } catch (error) {
+    } catch (error) {
       console.error('Error al guardar evento:', error);
-      
+
       if (error.response?.data) {
         setErrors(prev => ({ ...prev, ...error.response.data }));
       }
     } finally {
       setLoading(false);
-      */}
     }
-  
-    setError(`❌ ${message}`);
-    setLoading(false);
-  }
-  
   };
-  
+
   if (initialLoading) {
     return (
       <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
@@ -276,37 +200,18 @@ const EventForm = () => {
       </Box>
     );
   }
-  
+
   return (
     <Box sx={{ p: 3 }}>
       <Typography variant="h4" gutterBottom>
         {isEditMode ? 'Editar Evento' : 'Nuevo Evento'}
       </Typography>
-      {/* {error && (
-        <Typography color="error" sx={{ mb: 2 }}>
-          {error}
-        </Typography>
-      )} */}
 
-      {error && (
-        <Box sx={{ mb: 2, p: 2, bgcolor: '#ffe6e6', border: '1px solid #ff4d4f', borderRadius: '4px' }}>
-          <Typography color="error" fontWeight="bold">
-            {error}
-          </Typography>
-        </Box>
-      )}
-
-      <Paper elevation={3} sx={{ p: 3 }}>
-        <form onSubmit={handleSubmit}>
-          <Grid container spacing={2}>
-            <Grid item xs={12}>
-      
-              {/*      <Paper sx={{ p: 3 }}>
+      <Paper sx={{ p: 3 }}>
         <Box component="form" onSubmit={handleSubmit}>
           <Grid container spacing={3}>
             {/* Nombre del evento */}
-         {/*   <Grid item xs={12} sm={6}>
-              */}
+            <Grid item xs={12} sm={6}>
               <TextField
                 fullWidth
                 label="Nombre"
@@ -318,7 +223,7 @@ const EventForm = () => {
                 required
               />
             </Grid>
-            
+
             {/* Selección de locación */}
             <Grid item xs={12} sm={6}>
               <FormControl fullWidth error={Boolean(errors.location_id)} required>
@@ -338,7 +243,7 @@ const EventForm = () => {
                 {errors.location_id && <FormHelperText>{errors.location_id}</FormHelperText>}
               </FormControl>
             </Grid>
-            
+
             {/* Descripción del evento */}
             <Grid item xs={12}>
               <TextField
@@ -354,7 +259,7 @@ const EventForm = () => {
                 required
               />
             </Grid>
-            
+
             {/* Selección de fecha de inicio */}
             <Grid item xs={12} sm={6}>
               <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={es}>
@@ -373,7 +278,7 @@ const EventForm = () => {
                 />
               </LocalizationProvider>
             </Grid>
-            
+
             {/* Selección de fecha de fin */}
             <Grid item xs={12} sm={6}>
               <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={es}>
@@ -392,7 +297,7 @@ const EventForm = () => {
                 />
               </LocalizationProvider>
             </Grid>
-            
+
             {/* Estado del evento */}
             <Grid item xs={12} sm={6}>
               <FormControl fullWidth>
@@ -411,7 +316,7 @@ const EventForm = () => {
                 </Select>
               </FormControl>
             </Grid>
-            
+
             {/* URL de la imagen */}
             <Grid item xs={12} sm={6}>
               <TextField
@@ -423,7 +328,7 @@ const EventForm = () => {
                 placeholder="https://ejemplo.com/imagen.jpg"
               />
             </Grid>
-            
+
             {/* Tipo de servicio: Paquete o Servicios individuales */}
             <Grid item xs={12}>
               <FormControlLabel
@@ -437,7 +342,7 @@ const EventForm = () => {
                 label="Usar paquete de servicios"
               />
             </Grid>
-            
+
             {/* Selector condicional: Paquete o Servicios individuales */}
             <Grid item xs={12}>
               {formData.is_package ? (
@@ -484,7 +389,7 @@ const EventForm = () => {
                 </FormControl>
               )}
             </Grid>
-            
+
             {/* Botones de acción */}
             <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2, mt: 3 }}>
               <Button

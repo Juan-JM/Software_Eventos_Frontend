@@ -69,16 +69,16 @@ const Navbar = () => {
             {/* Vistas para admin de empresa (NO superadmin) */}
             {(currentUser.user_type === 'admin' || currentUser.user_type === 'staff') && (
               <>
-               <Button color="inherit" component={RouterLink} to="/events/listado">
+                <Button color="inherit" component={RouterLink} to="/events/listado">
                   Agenda
-                </Button>
-                <Button color="inherit" component={RouterLink} to="/backups">
-                  Backups
                 </Button>
                 <Button color="inherit" component={RouterLink} to="/subscription">
                   Suscripción
                 </Button>
-/*
+                <Button color="inherit" component={RouterLink} to="/sales">
+                  Nota de Venta
+                </Button>
+                {/* 
                 <Button color="inherit" component={RouterLink} to="/users">
                   Usuarios
                 </Button>
@@ -97,12 +97,10 @@ const Navbar = () => {
                 <Button color="inherit" component={RouterLink} to="/audit-logs">
                   Bitácora
                 </Button>
-                <Button color="inherit" component={RouterLink} to="/sales">
-                  Nota de Venta
-                </Button>
-*/
+ */}
 
-                
+
+
                 {/* Solo admins pueden ver usuarios */}
                 {currentUser.user_type === 'admin' && (
                   <Button color="inherit" component={RouterLink} to="/users">
@@ -125,14 +123,14 @@ const Navbar = () => {
                     <Button color="inherit" component={RouterLink} to="/events">
                       Eventos
                     </Button>
-                    
+
                     {/* PERSONAL - Solo Admin */}
                     {currentUser.user_type === 'admin' && (
                       <Button color="inherit" component={RouterLink} to="/staff">
                         Personal
                       </Button>
                     )}
-                    
+
                     {/* TAREAS - Admin y Staff */}
                     <Button color="inherit" component={RouterLink} to="/tasks">
                       Tareas

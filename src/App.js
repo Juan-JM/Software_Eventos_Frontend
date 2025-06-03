@@ -67,10 +67,13 @@ import TaskForm from './components/tasks/TaskForm';
 import TaskDetail from './components/tasks/TaskDetail';
 
 // Componentes de suscripción - COMENTADOS HASTA QUE LOS CREES
-// import SubscriptionStatus from './components/subscription/SubscriptionStatus';
-// import SubscriptionPlans from './components/subscription/SubscriptionPlans';
-// import SubscriptionSuccess from './components/subscription/SubscriptionSuccess';
-// import SubscriptionRequired from './components/subscription/SubscriptionRequired';
+import SubscriptionStatus from './components/subscription/SubscriptionStatus';
+import SubscriptionPlans from './components/subscription/SubscriptionPlans';
+import SubscriptionSuccess from './components/subscription/SubscriptionSuccess';
+import SubscriptionRequired from './components/subscription/SubscriptionRequired';
+
+
+
 
 // Página de inicio provisional
 import Dashboard from './components/dashboard/Dashboard';
@@ -78,11 +81,6 @@ import Dashboard from './components/dashboard/Dashboard';
 import BackupList from './components/backups/BackupList';
 //CALENDAR
 import AgendaCalendar from './components/calendar/AgendaCalendar';
-
-const Unauthorized = () => <div>No tienes permisos para acceder a esta página</div>;
-
-// Componente temporal para suscripción
-const TemporarySubscription = () => <div>Página de suscripción - Por implementar</div>;
 
 // Componente para configurar los interceptores
 function AxiosInterceptors() {
@@ -98,104 +96,103 @@ function AxiosInterceptors() {
 function App() {
   return (
     <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={es}>
-    <Router>
-      <AuthProvider>
-        <SubscriptionProvider>
-          <AxiosInterceptors />
-          <Navbar />
-          <Routes>
-            {/* Rutas públicas */}
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
-            <Route path="/logout" element={<Logout />} />
-            <Route path="/unauthorized" element={<Unauthorized />} />
-          
-            {/* Rutas de suscripción - TEMPORALES */}
-            <Route element={<PrivateRoute allowedRoles={['admin', 'staff', 'superadmin']} />}>
-              <Route path="/subscription" element={<TemporarySubscription />} />
-              <Route path="/subscription/plans" element={<TemporarySubscription />} />
-              <Route path="/subscription/success" element={<TemporarySubscription />} />
-              <Route path="/subscription/required" element={<TemporarySubscription />} />
-            </Route>
+      <Router>
+        <AuthProvider>
+          <SubscriptionProvider>
+            <AxiosInterceptors />
+            <Navbar />
+            <Routes>
+              {/* Rutas públicas */}
+              <Route path="/login" element={<Login />} />
+              <Route path="/register" element={<Register />} />
+              <Route path="/logout" element={<Logout />} />
 
-            {/* Rutas privadas - Admin y Superadmin */} 
-            <Route element={<PrivateRoute allowedRoles={['admin', 'superadmin']} />}>
-              <Route path="/users" element={<UserList />} />
-              <Route path="/users/new" element={<UserForm />} />
-              <Route path="/users/:id" element={<UserDetail />} />
-              <Route path="/audit-logs" element={<AuditLogList />} />
-              <Route path="/backups" element={< BackupList />} /> 
-              <Route path="/sales" element={ < NotaVentaForm />} /> 
-
-            </Route>
-
-            {/* Rutas privadas - Solo Superadmin */}
-            <Route element={<PrivateRoute allowedRoles={['superadmin']} />}>
-              <Route path="/companies" element={<CompanyList />} />
-              <Route path="/companies/new" element={<CompanyForm />} />
-              <Route path="/companies/:id" element={<CompanyDetail />} />
-              <Route path="/companies/:id/edit" element={<CompanyForm />} />
-            </Route>
-
-            {/* Rutas privadas que requieren suscripción - Admin y Staff */}
-            <Route element={<SubscriptionProtectedRoute allowedRoles={['admin', 'staff']} />}>
-              {/* Rutas para Servicios */}
-              <Route path="/services" element={<ServiceList />} />
-              <Route path="/services/new" element={<ServiceForm />} />
-              <Route path="/services/:id" element={<ServiceDetail />} />
-              <Route path="/services/:id/edit" element={<ServiceForm />} /> 
+              {/* Rutas de suscripción */}
+              <Route element={<PrivateRoute allowedRoles={['admin', 'staff', 'superadmin']} />}>
+                <Route path="/subscription" element={<SubscriptionStatus />} />
+                <Route path="/subscription/plans" element={<SubscriptionPlans />} />
+                <Route path="/subscription/success" element={<SubscriptionSuccess />} />
+                <Route path="/subscription/required" element={<SubscriptionRequired />} />
+              </Route>
               
-              {/* Rutas para Paquetes */}
-              <Route path="/packages" element={<PackageList />} />
-              <Route path="/packages/new" element={<PackageForm />} />
-              <Route path="/packages/:id" element={<PackageDetail />} />
-              <Route path="/packages/:id/edit" element={<PackageForm />} />
+              {/* Rutas privadas - Admin y Superadmin */}
+              <Route element={<PrivateRoute allowedRoles={['admin', 'superadmin']} />}>
+                <Route path="/users" element={<UserList />} />
+                <Route path="/users/new" element={<UserForm />} />
+                <Route path="/users/:id" element={<UserDetail />} />
+                <Route path="/audit-logs" element={<AuditLogList />} />
+                <Route path="/backups" element={< BackupList />} />
+                <Route path="/sales" element={< NotaVentaForm />} />
 
-              {/* Rutas para Locaciones */}
-              <Route path="/locations" element={<LocationList />} />
-              <Route path="/locations/new" element={<LocationForm />} />
-              <Route path="/locations/:id" element={<LocationDetail />} />
-              <Route path="/locations/:id/edit" element={<LocationForm />} />
+              </Route>
 
-              {/* Rutas para Eventos */}
-              <Route path="/events" element={<EventList />} />
-              <Route path="/events/new" element={<EventForm />} />
-              <Route path="/events/:id" element={<EventDetail />} />
-              <Route path="/events/:id/edit" element={<EventForm />} />
-              <Route path="/events/listado" element={<EventListByDate />} />
+              {/* Rutas privadas - Solo Superadmin */}
+              <Route element={<PrivateRoute allowedRoles={['superadmin']} />}>
+                <Route path="/companies" element={<CompanyList />} />
+                <Route path="/companies/new" element={<CompanyForm />} />
+                <Route path="/companies/:id" element={<CompanyDetail />} />
+                <Route path="/companies/:id/edit" element={<CompanyForm />} />
+              </Route>
 
-              {/* Nueva Ruta para Agenda */}
-              <Route path="/agenda" element={<AgendaCalendar />} />
-            </Route>
+              {/* Rutas privadas que requieren suscripción - Admin y Staff */}
+              <Route element={<SubscriptionProtectedRoute allowedRoles={['admin', 'staff']} />}>
+                {/* Rutas para Servicios */}
+                <Route path="/services" element={<ServiceList />} />
+                <Route path="/services/new" element={<ServiceForm />} />
+                <Route path="/services/:id" element={<ServiceDetail />} />
+                <Route path="/services/:id/edit" element={<ServiceForm />} />
 
-            {/* Rutas para Personal - Solo Admin con suscripción */}
-            <Route element={<SubscriptionProtectedRoute allowedRoles={['admin']} />}>
-              <Route path="/staff" element={<StaffList />} />
-              <Route path="/staff/new" element={<StaffForm />} />
-              <Route path="/staff/:id" element={<StaffDetail />} />
-              <Route path="/staff/:id/edit" element={<StaffForm />} />
-            </Route>
+                {/* Rutas para Paquetes */}
+                <Route path="/packages" element={<PackageList />} />
+                <Route path="/packages/new" element={<PackageForm />} />
+                <Route path="/packages/:id" element={<PackageDetail />} />
+                <Route path="/packages/:id/edit" element={<PackageForm />} />
 
-            {/* Rutas para Tareas - Admin y Staff con suscripción */}
-            <Route element={<SubscriptionProtectedRoute allowedRoles={['admin', 'staff']} />}>
-              <Route path="/tasks" element={<TaskList />} />
-              <Route path="/tasks/new" element={<TaskForm />} />
-              <Route path="/tasks/:id" element={<TaskDetail />} />
-              <Route path="/tasks/:id/edit" element={<TaskForm />} />
-            </Route>
-            
-            {/* Rutas básicas para usuarios autenticados */}
-            <Route element={<PrivateRoute />}>
-              <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/profile" element={<div>Mi Perfil</div>} />
-            </Route>
-            
-            {/* Redirigir a dashboard si no hay ruta */}
-            <Route path="/" element={<Navigate to="/dashboard" />} />
-          </Routes>
-        </SubscriptionProvider>
-      </AuthProvider>
-    </Router>
+                {/* Rutas para Locaciones */}
+                <Route path="/locations" element={<LocationList />} />
+                <Route path="/locations/new" element={<LocationForm />} />
+                <Route path="/locations/:id" element={<LocationDetail />} />
+                <Route path="/locations/:id/edit" element={<LocationForm />} />
+
+                {/* Rutas para Eventos */}
+                <Route path="/events" element={<EventList />} />
+                <Route path="/events/new" element={<EventForm />} />
+                <Route path="/events/:id" element={<EventDetail />} />
+                <Route path="/events/:id/edit" element={<EventForm />} />
+                <Route path="/events/listado" element={<EventListByDate />} />
+
+                {/* Nueva Ruta para Agenda */}
+                <Route path="/agenda" element={<AgendaCalendar />} />
+              </Route>
+
+              {/* Rutas para Personal - Solo Admin con suscripción */}
+              <Route element={<SubscriptionProtectedRoute allowedRoles={['admin']} />}>
+                <Route path="/staff" element={<StaffList />} />
+                <Route path="/staff/new" element={<StaffForm />} />
+                <Route path="/staff/:id" element={<StaffDetail />} />
+                <Route path="/staff/:id/edit" element={<StaffForm />} />
+              </Route>
+
+              {/* Rutas para Tareas - Admin y Staff con suscripción */}
+              <Route element={<SubscriptionProtectedRoute allowedRoles={['admin', 'staff']} />}>
+                <Route path="/tasks" element={<TaskList />} />
+                <Route path="/tasks/new" element={<TaskForm />} />
+                <Route path="/tasks/:id" element={<TaskDetail />} />
+                <Route path="/tasks/:id/edit" element={<TaskForm />} />
+              </Route>
+
+              {/* Rutas básicas para usuarios autenticados */}
+              <Route element={<PrivateRoute />}>
+                <Route path="/dashboard" element={<Dashboard />} />
+                <Route path="/profile" element={<div>Mi Perfil</div>} />
+              </Route>
+
+              {/* Redirigir a dashboard si no hay ruta */}
+              <Route path="/" element={<Navigate to="/dashboard" />} />
+            </Routes>
+          </SubscriptionProvider>
+        </AuthProvider>
+      </Router>
     </LocalizationProvider>
   );
 }
