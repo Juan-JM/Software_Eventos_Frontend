@@ -93,7 +93,7 @@ function AxiosInterceptors() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // setupAxiosInterceptors(navigate); // Comentado hasta que tengas el archivo
+    setupAxiosInterceptors(navigate); // Comentado hasta que tengas el archivo
   }, [navigate]);
 
   return null;
