@@ -124,6 +124,11 @@ const Navbar = () => {
                       Eventos
                     </Button>
 
+                    {/* CRONOGRAMA - Admin y Staff */}
+                    <Button color="inherit" component={RouterLink} to="/schedules">
+                      Cronograma
+                    </Button>
+
                     {/* PERSONAL - Solo Admin */}
                     {currentUser.user_type === 'admin' && (
                       <Button color="inherit" component={RouterLink} to="/staff">
