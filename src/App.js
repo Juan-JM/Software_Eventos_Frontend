@@ -28,6 +28,11 @@ import UserDetail from './components/users/UserDetail';
 // Componentes de la bitácora
 import AuditLogList from './components/audit/AuditLogList';
 
+// Componentes de proveedores
+import ProviderList from './components/providers/ProviderList';
+import ProviderForm from './components/providers/ProviderForm';
+import ProviderDetail from './components/providers/ProviderDetail';
+
 // Componentes de servicios
 import ServiceList from './components/services/ServiceList';
 import ServiceForm from './components/services/ServiceForm';
@@ -68,6 +73,7 @@ import StaffDetail from './components/staff/StaffDetail';
 import NotaVentaForm from './components/sales/SalesNote';
 import ListaNotasVenta from './components/sales/ListarSalesNote.js';
 import SalesNoteScreen from './components/sales/SalesNoteR.js';
+
 // Componentes de tareas
 import TaskList from './components/tasks/TaskList';
 import TaskForm from './components/tasks/TaskForm';
@@ -78,9 +84,6 @@ import SubscriptionStatus from './components/subscription/SubscriptionStatus';
 import SubscriptionPlans from './components/subscription/SubscriptionPlans';
 import SubscriptionSuccess from './components/subscription/SubscriptionSuccess';
 import SubscriptionRequired from './components/subscription/SubscriptionRequired';
-
-
-
 
 // Página de inicio provisional
 import Dashboard from './components/dashboard/Dashboard';
@@ -143,6 +146,12 @@ function App() {
 
               {/* Rutas privadas que requieren suscripción - Admin y Staff */}
               <Route element={<SubscriptionProtectedRoute allowedRoles={['admin', 'staff']} />}>
+                {/* Rutas para Proveedores */}
+                <Route path="/providers" element={<ProviderList />} />
+                <Route path="/providers/new" element={<ProviderForm />} />
+                <Route path="/providers/:id" element={<ProviderDetail />} />
+                <Route path="/providers/:id/edit" element={<ProviderForm />} />
+
                 {/* Rutas para Servicios */}
                 <Route path="/services" element={<ServiceList />} />
                 <Route path="/services/new" element={<ServiceForm />} />
