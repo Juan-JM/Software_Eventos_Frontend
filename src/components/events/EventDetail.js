@@ -132,6 +132,11 @@ const EventDetail = () => {
             <Typography variant="subtitle1" color="textSecondary">Fecha de fin</Typography>
             <Typography variant="body1">{new Date(event.end_date).toLocaleString()}</Typography>
           </Grid>
+          
+          <Grid item xs={12} md={6}>
+            <Typography variant="subtitle1" color="textSecondary">Cantidad de asistentes</Typography>
+            <Typography variant="body1">{event.attendee_count}</Typography>
+          </Grid>
 
           <Grid item xs={12} md={6}>
             <Typography variant="subtitle1" color="textSecondary">Locación</Typography>
@@ -141,6 +146,35 @@ const EventDetail = () => {
           <Grid item xs={12} md={6}>
             <Typography variant="subtitle1" color="textSecondary">Estado</Typography>
             <Typography variant="body1">{renderStatus(event.status)}</Typography>
+          </Grid>
+          
+          <Grid item xs={12} md={6}>
+            {/* <Typography variant="subtitle1" color="textSecondary">Cliente</Typography>
+            <Typography variant="body1">
+              {event.owner
+                ? `${event.owner.first_name} ${event.owner.last_name} (${event.owner.email})`
+                : 'Sin cliente asignado'}
+            </Typography> */}
+            <Typography variant="subtitle1" color="textSecondary">Cliente</Typography>
+              {event.owner ? (
+                <Box sx={{ mt: 1 }}>
+                  <Typography variant="body1">
+                    <strong>Nombre:</strong> {event.owner.first_name} {event.owner.last_name}
+                  </Typography>
+                  <Typography variant="body1">
+                    <strong>Email:</strong> {event.owner.email}
+                  </Typography>
+                  <Typography variant="body1">
+                    <strong>Teléfono:</strong> {event.owner.phone || 'No disponible'}
+                  </Typography>
+                  <Typography variant="body1">
+                    <strong>Dirección:</strong> {event.owner.address || 'No disponible'}
+                  </Typography>
+                </Box>
+              ) : (
+                <Typography variant="body1">Sin cliente asignado</Typography>
+              )}
+
           </Grid>
 
           <Grid item xs={12}>

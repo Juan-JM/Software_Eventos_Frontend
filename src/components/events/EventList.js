@@ -124,8 +124,10 @@ const EventList = () => {
                 <TableCell>Locación</TableCell>
                 <TableCell>Fecha Inicio</TableCell>
                 <TableCell>Fecha Fin</TableCell>
+                <TableCell>Cant. Asistentes</TableCell>
                 <TableCell>Estado</TableCell>
-                <TableCell>Servicios</TableCell> {/* Agregado */}
+                <TableCell>Servicios</TableCell> 
+                <TableCell>Cliente</TableCell>
                 <TableCell>Acciones</TableCell>
             </TableRow>
          </TableHead>
@@ -136,6 +138,7 @@ const EventList = () => {
                 <TableCell>{event.location ? event.location.name : 'Sin locación'}</TableCell>
                 <TableCell>{formatearFecha(event.start_date)}</TableCell>
                 <TableCell>{formatearFecha(event.end_date)}</TableCell>
+                <TableCell>{event.attendee_count}</TableCell>
                 <TableCell>{event.status}</TableCell>
 
                 {/* Aquí mostramos los servicios */}
@@ -145,6 +148,11 @@ const EventList = () => {
                     ) : (
                     'Sin servicios'
                     )}
+                </TableCell>
+                <TableCell>
+                  {event.owner
+                    ? `${event.owner.first_name} ${event.owner.last_name}`
+                    : 'Sin cliente'}
                 </TableCell>
 
                 {/* Acciones */}
