@@ -192,7 +192,7 @@ const EventForm = () => {
         status: event.status,
         image: event.image,
         attendee_count: parseInt(event.attendee_count || 0, 10),
-        owner: event.owner
+        owner_data: event.owner
       };
       
       // Añadir los campos específicos según el tipo de evento
