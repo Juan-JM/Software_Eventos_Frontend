@@ -71,8 +71,9 @@ import StaffDetail from './components/staff/StaffDetail';
 
 // Nota de venta
 import NotaVentaForm from './components/sales/SalesNote';
-import ListaNotasVenta from './components/sales/ListarSalesNote.js';
 import SalesNoteScreen from './components/sales/SalesNoteR.js';
+import ReporteVentas from './components/sales/ReporteVentas.js';
+
 
 // Componentes de tareas
 import TaskList from './components/tasks/TaskList';
@@ -134,6 +135,7 @@ function App() {
                 <Route path="/backups" element={< BackupList />} />
                 <Route path="/sales-note" element={< SalesNoteScreen />} />
                 <Route path="/sales" element={< NotaVentaForm />} />
+                <Route path="/reporte-ventas" element={< ReporteVentas />} />
               </Route>
 
               {/* Rutas privadas - Solo Superadmin */}
