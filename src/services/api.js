@@ -1,7 +1,7 @@
 // frontend/src/services/api.js
 import axios from 'axios';
 
-// const API_URL = process.env.REACT_APP_API_URL;
+//const API_URL = process.env.REACT_APP_API_URL;
 const API_URL = 'http://localhost:8000/api/'; // #La direccion del servidor de la api se guarda en .env
 
 const api = axios.create({

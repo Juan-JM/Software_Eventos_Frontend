@@ -1,12 +1,15 @@
 import React, { useState, useEffect } from "react";
-import api from "../../services/api";
+import axios from "axios";
+import api from '../../services/api';
 
 const BackupList = () => {
   const [backups, setBackups] = useState([]);
+  const baseURL = "http://localhost:8000/api";
 
   const fetchBackups = async () => {
     try {
-      const response = await api.get("backup/");
+      //const token = localStorage.getItem("access_token"); 
+      const response = await api.get('backup/');
       setBackups(response.data);
     } catch (error) {
       console.error("Error al obtener backups", error);
@@ -17,7 +20,8 @@ const BackupList = () => {
     if (!window.confirm("¿Deseas generar un nuevo backup?")) return;
 
     try {
-      await api.post("backup/generate/");
+      //const token = localStorage.getItem("access_token"); 
+      await api.post(`${baseURL}/backup/generate/`);
       alert("Backup generado correctamente");
       fetchBackups();
     } catch (error) {
@@ -27,8 +31,8 @@ const BackupList = () => {
   };
 
   const downloadBackup = (fileName) => {
-    const baseUrl = process.env.URL_LOCALHOST_SERVER 
-    const url = `${baseUrl}/backups/${fileName}`
+    const baseUrl = "http://localhost:8000/media/"; //No agregar 'api', esto es para que acceda a la carpeta donde se guardan los backups generados 
+    const url = `${baseUrl}backups/${fileName}`
     window.open(url, "_blank");
   };
 

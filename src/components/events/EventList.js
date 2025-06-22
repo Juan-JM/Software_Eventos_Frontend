@@ -3,9 +3,11 @@ import { Link } from 'react-router-dom';
 import { 
   Table, TableBody, TableCell, TableContainer, TableHead, 
   TableRow, Paper, Button, Typography, Box, CircularProgress,
-  Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle
+  Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle,
+  Chip
 } from '@mui/material';
 import api from '../../services/api';
+
 const formatearFecha = (fechaISO) => {
   if (!fechaISO) return '';
   const fecha = new Date(fechaISO);
@@ -49,7 +51,6 @@ const EventList = () => {
     }
   };
   
-
   useEffect(() => {
     loadEvents();
   }, []);
@@ -75,15 +76,42 @@ const EventList = () => {
     setEventToDelete(null);
   };
 
-  // const renderStatus = (status) => {
-  //   const statuses = {
-  //     'scheduled': 'Programado',
-  //     'in_progress': 'En curso',
-  //     'completed': 'Finalizado',
-  //     'cancelled': 'Cancelado'
-  //   };
-  //   return statuses[status] || status;
-  // };
+  // Función para renderizar servicios o paquete según corresponda
+  const renderServicesOrPackage = (event) => {
+    if (event.is_package) {
+      // Si es un paquete, mostramos el nombre del paquete
+      return (
+        <Box>
+          <Chip 
+            label="Paquete" 
+            size="small" 
+            color="primary" 
+            sx={{ mr: 1, mb: 1 }} 
+          />
+          <Typography variant="body2">
+            {event.package ? event.package.name : 'Sin paquete asignado'}
+          </Typography>
+        </Box>
+      );
+    } else {
+      // Si son servicios individuales
+      return (
+        <Box>
+          <Chip 
+            label="Servicios individuales" 
+            size="small" 
+            color="secondary" 
+            sx={{ mr: 1, mb: 1 }} 
+          />
+          <Typography variant="body2">
+            {Array.isArray(event.services) && event.services.length > 0
+              ? event.services.map((service) => service.name).join(', ')
+              : 'Sin servicios asignados'}
+          </Typography>
+        </Box>
+      );
+    }
+  };
 
   if (loading) {
     return (
@@ -118,75 +146,72 @@ const EventList = () => {
       ) : (
         <TableContainer component={Paper}>
           <Table>
-          <TableHead>
-            <TableRow>
+            <TableHead>
+              <TableRow>
                 <TableCell>Nombre</TableCell>
                 <TableCell>Locación</TableCell>
                 <TableCell>Fecha Inicio</TableCell>
                 <TableCell>Fecha Fin</TableCell>
                 <TableCell>Cant. Asistentes</TableCell>
                 <TableCell>Estado</TableCell>
-                <TableCell>Servicios</TableCell> 
+                <TableCell>Servicios / Paquete</TableCell>
                 <TableCell>Cliente</TableCell>
                 <TableCell>Acciones</TableCell>
-            </TableRow>
-         </TableHead>
-         <TableBody>
-            {events.map((event) => (
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {events.map((event) => (
                 <TableRow key={event.id}>
-                <TableCell>{event.name}</TableCell>
-                <TableCell>{event.location ? event.location.name : 'Sin locación'}</TableCell>
-                <TableCell>{formatearFecha(event.start_date)}</TableCell>
-                <TableCell>{formatearFecha(event.end_date)}</TableCell>
-                <TableCell>{event.attendee_count}</TableCell>
-                <TableCell>{event.status}</TableCell>
+                  <TableCell>{event.name}</TableCell>
+                  <TableCell>{event.location ? event.location.name : 'Sin locación'}</TableCell>
+                  <TableCell>{formatearFecha(event.start_date)}</TableCell>
+                  <TableCell>{formatearFecha(event.end_date)}</TableCell>
+                  <TableCell>{event.attendee_count || 0}</TableCell>
+                  <TableCell>{event.status}</TableCell>
+                  
+                  {/* Celda de servicios o paquete */}
+                  <TableCell>
+                    {renderServicesOrPackage(event)}
+                  </TableCell>
 
-                {/* Aquí mostramos los servicios */}
-                <TableCell>
-                    {Array.isArray(event.services) && event.services.length > 0 ? (
-                    event.services.map((service) => service.name).join(', ')
-                    ) : (
-                    'Sin servicios'
-                    )}
-                </TableCell>
-                <TableCell>
-                  {event.owner
-                    ? `${event.owner.first_name} ${event.owner.last_name}`
-                    : 'Sin cliente'}
-                </TableCell>
+                  {/* Celda de cliente */}
+                  <TableCell>
+                    {event.owner
+                      ? `${event.owner.first_name} ${event.owner.last_name}`
+                      : 'Sin cliente'}
+                  </TableCell>
 
-                {/* Acciones */}
-                <TableCell>
+                  {/* Acciones */}
+                  <TableCell>
                     <Button 
-                        component={Link} 
-                        to={`/events/${event.id}`} 
-                        color="primary" 
-                        size="small" 
-                        sx={{ mr: 1 }}
+                      component={Link} 
+                      to={`/events/${event.id}`} 
+                      color="primary" 
+                      size="small" 
+                      sx={{ mr: 1 }}
                     >
-                        Ver
+                      Ver
                     </Button>
                     <Button 
-                        component={Link} 
-                        to={`/events/${event.id}/edit`} 
-                        color="secondary" 
-                        size="small" 
-                        sx={{ mr: 1 }}
+                      component={Link} 
+                      to={`/events/${event.id}/edit`} 
+                      color="secondary" 
+                      size="small" 
+                      sx={{ mr: 1 }}
                     >
-                        Editar
+                      Editar
                     </Button>
                     <Button 
-                        onClick={() => handleDeleteClick(event)} 
-                        color="error" 
-                        size="small"
+                      onClick={() => handleDeleteClick(event)} 
+                      color="error" 
+                      size="small"
                     >
-                        Eliminar
+                      Eliminar
                     </Button>
-                    </TableCell>
+                  </TableCell>
                 </TableRow>
-            ))}
-        </TableBody>
-
+              ))}
+            </TableBody>
           </Table>
         </TableContainer>
       )}
