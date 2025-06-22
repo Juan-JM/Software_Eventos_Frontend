@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Box, Typography, Button, Paper, Grid } from '@mui/material';
+import { Box, Typography, Button, Paper} from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import api from '../../services/api';
 
@@ -23,6 +23,7 @@ const NotasVentaList = () => {
     <Box sx={{ p: 3 }}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 3 }}>
         <Typography variant="h4">Notas de Venta</Typography>
+        <Button variant="contained" onClick={() => navigate('/reporte-ventas')}> Reporte de Ventas </Button>
         <Button variant="contained" onClick={() => navigate('/sales')}>Nueva Nota de Venta</Button>
       </Box>
 

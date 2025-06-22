@@ -8,6 +8,7 @@ import api from '../../services/api';
 
 const NotaVentaForm = () => {
   const [cliente, setCliente] = useState('');
+  const [correo, setCorreo] = useState('');        //Nuevo, para el correo
   const [servicios, setServicios] = useState([]);
   const [detalles, setDetalles] = useState([]);
   const [openSnackbar, setOpenSnackbar] = useState(false);
@@ -48,9 +49,11 @@ const NotaVentaForm = () => {
     try {
       await api.post('sales/notas-venta/', {
         cliente_nombre: cliente,
+        correo_cliente: correo,
         detalles
       });
       setCliente('');
+      setCorreo('');
       setDetalles([]);
       setOpenSnackbar(true);
     } catch (error) {
@@ -69,6 +72,17 @@ const NotaVentaForm = () => {
               label="Nombre del cliente"
               value={cliente}
               onChange={(e) => setCliente(e.target.value)}
+              fullWidth
+              required
+            />
+          </Grid>
+
+          {/* Campo para el correo*/}
+          <Grid item xs={12}>
+            <TextField 
+              label="Correo del cliente"
+              value={correo}
+              onChange={(e) => setCorreo(e.target.value)}
               fullWidth
               required
             />
