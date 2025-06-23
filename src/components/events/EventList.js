@@ -7,6 +7,7 @@ import {
   Chip
 } from '@mui/material';
 import api from '../../services/api';
+import { useAuth } from '../../contexts/AuthContext';
 
 const formatearFecha = (fechaISO) => {
   if (!fechaISO) return '';
@@ -21,6 +22,7 @@ const formatearFecha = (fechaISO) => {
 };
 
 const EventList = () => {
+  const { currentUser } = useAuth();
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -125,6 +127,8 @@ const EventList = () => {
     <Box sx={{ p: 3 }}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 3 }}>
         <Typography variant="h4">Eventos</Typography>
+        {/* Ocultar botón para clientes */}
+        {currentUser?.user_type !== 'customer' && (
         <Button 
           variant="contained" 
           color="primary" 
@@ -133,6 +137,7 @@ const EventList = () => {
         >
           Nuevo Evento
         </Button>
+        )}
       </Box>
       
       {error && (
@@ -192,22 +197,29 @@ const EventList = () => {
                     >
                       Ver
                     </Button>
-                    <Button 
-                      component={Link} 
-                      to={`/events/${event.id}/edit`} 
-                      color="secondary" 
-                      size="small" 
-                      sx={{ mr: 1 }}
-                    >
+
+                    {/* SOLO mostrar EDITAR si NO es cliente */}
+                    {currentUser?.user_type !== 'customer' && (
+                      <Button 
+                        component={Link} 
+                        to={`/events/${event.id}/edit`} 
+                        color="secondary" 
+                        size="small" 
+                        sx={{ mr: 1 }}
+                      >
                       Editar
-                    </Button>
-                    <Button 
-                      onClick={() => handleDeleteClick(event)} 
-                      color="error" 
-                      size="small"
-                    >
-                      Eliminar
-                    </Button>
+                      </Button> 
+                    )}
+                    {/* SOLO mostrar EDITAR si NO es cliente */}
+                    {currentUser?.user_type !== 'customer' && (
+                      <Button 
+                        onClick={() => handleDeleteClick(event)} 
+                        color="error" 
+                        size="small"
+                      >
+                        Eliminar
+                      </Button>
+                    )}
                   </TableCell>
                 </TableRow>
               ))}
