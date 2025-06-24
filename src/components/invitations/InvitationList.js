@@ -20,6 +20,9 @@ import {
   Menu,
   Divider,
   InputAdornment,
+  Snackbar,
+  Alert,
+  CircularProgress,
 } from "@mui/material"
 import {
   Add,
@@ -58,6 +61,14 @@ const InvitationList = () => {
   const [eventFilter, setEventFilter] = useState("todos")
   const [anchorEl, setAnchorEl] = useState(null)
   const [selectedInvitation, setSelectedInvitation] = useState(null)
+  
+  // ✅ NUEVOS ESTADOS para email
+  const [sendingEmail, setSendingEmail] = useState({})
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: '',
+    severity: 'success'
+  })
 
   useEffect(() => {
     loadData()
@@ -129,33 +140,80 @@ const InvitationList = () => {
     setSelectedInvitation(null)
   }
 
+  // ✅ FUNCIÓN MEJORADA para enviar invitación con email
   const handleSendInvitation = async (id) => {
+    setSendingEmail(prev => ({ ...prev, [id]: true }))
+    
     try {
+      console.log(`📧 Enviando invitación ID: ${id} (ahora incluye email automático)`)
+      
       await sendInvitation(id)
+      
+      setSnackbar({
+        open: true,
+        message: '📧 Invitación enviada exitosamente. El invitado recibirá un email.',
+        severity: 'success'
+      })
+      
       loadData()
       handleMenuClose()
+      
     } catch (error) {
       console.error("Error al enviar invitación:", error)
+      
+      setSnackbar({
+        open: true,
+        message: '❌ Error al enviar invitación. El estado se actualizó pero el email puede no haberse enviado.',
+        severity: 'warning'
+      })
+    } finally {
+      setSendingEmail(prev => ({ ...prev, [id]: false }))
     }
   }
 
   const handleConfirmInvitation = async (id) => {
     try {
       await updateInvitationStatus(id, "confirmada")
+      
+      setSnackbar({
+        open: true,
+        message: '✅ Invitación confirmada exitosamente',
+        severity: 'success'
+      })
+      
       loadData()
       handleMenuClose()
     } catch (error) {
       console.error("Error al confirmar invitación:", error)
+      
+      setSnackbar({
+        open: true,
+        message: '❌ Error al confirmar invitación',
+        severity: 'error'
+      })
     }
   }
 
   const handleRejectInvitation = async (id) => {
     try {
       await updateInvitationStatus(id, "rechazada")
+      
+      setSnackbar({
+        open: true,
+        message: '🚫 Invitación rechazada',
+        severity: 'info'
+      })
+      
       loadData()
       handleMenuClose()
     } catch (error) {
       console.error("Error al rechazar invitación:", error)
+      
+      setSnackbar({
+        open: true,
+        message: '❌ Error al rechazar invitación',
+        severity: 'error'
+      })
     }
   }
 
@@ -163,12 +221,30 @@ const InvitationList = () => {
     if (window.confirm("¿Está seguro de eliminar esta invitación?")) {
       try {
         await deleteInvitation(id)
+        
+        setSnackbar({
+          open: true,
+          message: '🗑️ Invitación eliminada exitosamente',
+          severity: 'info'
+        })
+        
         loadData()
         handleMenuClose()
       } catch (error) {
         console.error("Error al eliminar invitación:", error)
+        
+        setSnackbar({
+          open: true,
+          message: '❌ Error al eliminar invitación',
+          severity: 'error'
+        })
       }
     }
+  }
+
+  // ✅ FUNCIÓN para cerrar snackbar
+  const handleCloseSnackbar = () => {
+    setSnackbar(prev => ({ ...prev, open: false }))
   }
 
   const getStatusColor = (status) => {
@@ -516,7 +592,7 @@ const InvitationList = () => {
                           {invitation.assigned_seats.split(",").map((seat, index) => (
                             <Chip
                               key={index}
-                              label={seat.trim().replace(/([A-Z])(\d+)/, "$1-$2")}
+                              label={seat.trim()}
                               size="small"
                               variant="outlined"
                               sx={{
@@ -579,20 +655,28 @@ const InvitationList = () => {
         Nueva Invitación
       </Button>
 
-      {/* Context Menu */}
+      {/* Context Menu - ✅ MEJORADO */}
       <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleMenuClose}>
         <MenuItem onClick={() => navigate(`/invitations/${selectedInvitation?.id}`)}>Ver Detalles</MenuItem>
         <MenuItem onClick={() => navigate(`/invitations/${selectedInvitation?.id}/edit`)}>Editar</MenuItem>
         <Divider />
 
-        {/* Opciones específicas según el estado */}
+        {/* ✅ MEJORADO: Enviar Invitación con loading y mejor UX */}
         {selectedInvitation?.status === "pendiente" && (
-          <MenuItem onClick={() => handleSendInvitation(selectedInvitation.id)}>
-            <Send sx={{ fontSize: 16, mr: 1 }} />
-            Enviar Invitación
+          <MenuItem 
+            onClick={() => handleSendInvitation(selectedInvitation.id)}
+            disabled={sendingEmail[selectedInvitation.id]}
+          >
+            {sendingEmail[selectedInvitation.id] ? (
+              <CircularProgress size={16} sx={{ mr: 1 }} />
+            ) : (
+              <Send sx={{ fontSize: 16, mr: 1 }} />
+            )}
+            {sendingEmail[selectedInvitation.id] ? 'Enviando Email...' : 'Enviar Invitación'}
           </MenuItem>
         )}
 
+        {/* Opciones específicas según el estado */}
         {selectedInvitation?.status === "enviada" && (
           <>
             <MenuItem onClick={() => handleConfirmInvitation(selectedInvitation.id)}>
@@ -611,6 +695,23 @@ const InvitationList = () => {
           Eliminar
         </MenuItem>
       </Menu>
+
+      {/* ✅ NUEVO: Snackbar para feedback */}
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={6000}
+        onClose={handleCloseSnackbar}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
+      >
+        <Alert 
+          onClose={handleCloseSnackbar} 
+          severity={snackbar.severity}
+          variant="filled"
+          sx={{ width: '100%' }}
+        >
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </Box>
   )
 }
