@@ -1,3 +1,4 @@
+//src/services/service.service.js
 import api from './api';
 
 export const getAllServices = () => {

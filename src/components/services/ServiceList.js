@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { getAllServices, deleteService } from '../../services/service.service';
 // import { useAuth } from '../../contexts/AuthContext';
-import { 
-  Table, TableBody, TableCell, TableContainer, TableHead, 
+import {
+  Table, TableBody, TableCell, TableContainer, TableHead,
   TableRow, Paper, Button, Typography, Box, CircularProgress,
   Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle
 } from '@mui/material';
@@ -77,16 +77,16 @@ const ServiceList = () => {
     <Box sx={{ p: 3 }}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 3 }}>
         <Typography variant="h4">Servicios</Typography>
-        <Button 
-          variant="contained" 
-          color="primary" 
-          component={Link} 
+        <Button
+          variant="contained"
+          color="primary"
+          component={Link}
           to="/services/new"
         >
           Nuevo Servicio
         </Button>
       </Box>
-      
+
       {error && (
         <Typography color="error" sx={{ mb: 2 }}>
           {error}
@@ -119,20 +119,22 @@ const ServiceList = () => {
                   <TableCell>
                     {service.standard_duration ? `${service.standard_duration} minutos` : 'N/A'}
                   </TableCell>
-                  <TableCell>{service.provider}</TableCell>
                   <TableCell>
-                    <Button 
-                      component={Link} 
-                      to={`/services/${service.id}`} 
-                      color="primary" 
-                      size="small" 
+                    {service.provider_detail ? service.provider_detail.commercial_name : 'Sin proveedor'}
+                  </TableCell>
+                  <TableCell>
+                    <Button
+                      component={Link}
+                      to={`/services/${service.id}`}
+                      color="primary"
+                      size="small"
                       sx={{ mr: 1 }}
                     >
                       Editar
                     </Button>
-                    <Button 
-                      onClick={() => handleDeleteClick(service)} 
-                      color="error" 
+                    <Button
+                      onClick={() => handleDeleteClick(service)}
+                      color="error"
                       size="small"
                     >
                       Eliminar
@@ -153,7 +155,7 @@ const ServiceList = () => {
         <DialogTitle>Confirmar eliminación</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            ¿Estás seguro de que deseas eliminar el servicio "{serviceToDelete?.name}"? 
+            ¿Estás seguro de que deseas eliminar el servicio "{serviceToDelete?.name}"?
             Esta acción no se puede deshacer.
           </DialogContentText>
         </DialogContent>

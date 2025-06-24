@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { 
-  TextField, Button, Box, Typography, MenuItem, FormControl, 
-  Select, InputLabel, CircularProgress, Grid, Paper 
+import {
+  TextField, Button, Box, Typography, MenuItem, FormControl,
+  Select, InputLabel, CircularProgress, Grid, Paper
 } from '@mui/material';
 import { createService, getServiceById, updateService } from '../../services/service.service';
+import { getAllProviders } from '../../services/providers.service';
 
 const ServiceForm = () => {
   const { id } = useParams();
@@ -19,6 +20,7 @@ const ServiceForm = () => {
     standard_duration: '',
     provider: ''
   });
+  const [providers, setProviders] = useState([]);
 
   const isEditMode = Boolean(id);
 
@@ -40,6 +42,18 @@ const ServiceForm = () => {
     loadService();
   }, [id, isEditMode]);
 
+  useEffect(() => {
+    const loadProviders = async () => {
+      try {
+        const response = await getAllProviders();
+        setProviders(response.data);
+      } catch (err) {
+        console.error('Error al cargar proveedores:', err);
+      }
+    };
+
+    loadProviders();
+  }, []);
   const handleChange = (e) => {
     const { name, value } = e.target;
     setService(prev => ({
@@ -52,7 +66,7 @@ const ServiceForm = () => {
     e.preventDefault();
     try {
       setLoading(true);
-      
+
       // Preparar los datos para enviar
       const serviceData = {
         ...service,
@@ -65,7 +79,7 @@ const ServiceForm = () => {
       } else {
         await createService(serviceData);
       }
-      
+
       navigate('/services');
     } catch (err) {
       setError('Error al guardar el servicio: ' + err.message);
@@ -86,13 +100,13 @@ const ServiceForm = () => {
       <Typography variant="h4" sx={{ mb: 3 }}>
         {isEditMode ? 'Editar Servicio' : 'Nuevo Servicio'}
       </Typography>
-      
+
       {error && (
         <Typography color="error" sx={{ mb: 2 }}>
           {error}
         </Typography>
       )}
-      
+
       <Paper elevation={3} sx={{ p: 3 }}>
         <form onSubmit={handleSubmit}>
           <Grid container spacing={2}>
@@ -107,7 +121,7 @@ const ServiceForm = () => {
                 margin="normal"
               />
             </Grid>
-            
+
             <Grid item xs={12}>
               <TextField
                 label="Descripción"
@@ -120,7 +134,7 @@ const ServiceForm = () => {
                 margin="normal"
               />
             </Grid>
-            
+
             <Grid item xs={12} md={6}>
               <TextField
                 label="Precio Base"
@@ -134,7 +148,7 @@ const ServiceForm = () => {
                 margin="normal"
               />
             </Grid>
-            
+
             <Grid item xs={12} md={6}>
               <FormControl fullWidth margin="normal">
                 <InputLabel>Unidad de Medida</InputLabel>
@@ -152,7 +166,7 @@ const ServiceForm = () => {
                 </Select>
               </FormControl>
             </Grid>
-            
+
             <Grid item xs={12} md={6}>
               <TextField
                 label="Duración Estándar (minutos)"
@@ -166,30 +180,36 @@ const ServiceForm = () => {
                 helperText="Dejar en blanco si no aplica"
               />
             </Grid>
-            
+
             <Grid item xs={12} md={6}>
-              <TextField
-                label="Proveedor"
-                name="provider"
-                value={service.provider}
-                onChange={handleChange}
-                fullWidth
-                required
-                margin="normal"
-              />
+              <FormControl fullWidth margin="normal" required>
+                <InputLabel>Proveedor</InputLabel>
+                <Select
+                  name="provider"
+                  value={service.provider}
+                  onChange={handleChange}
+                  label="Proveedor"
+                >
+                  {providers.map((provider) => (
+                    <MenuItem key={provider.id} value={provider.id}>
+                      {provider.commercial_name}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
             </Grid>
-            
+
             <Grid item xs={12} sx={{ mt: 2 }}>
               <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2 }}>
-                <Button 
-                  variant="outlined" 
+                <Button
+                  variant="outlined"
                   onClick={() => navigate('/services')}
                 >
                   Cancelar
                 </Button>
-                <Button 
-                  type="submit" 
-                  variant="contained" 
+                <Button
+                  type="submit"
+                  variant="contained"
                   color="primary"
                   disabled={loading}
                 >

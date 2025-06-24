@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { 
-  Box, Typography, Paper, Grid, Button, CircularProgress, 
-  Divider, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle 
+import {
+  Box, Typography, Paper, Grid, Button, CircularProgress,
+  Divider, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle
 } from '@mui/material';
 import { getServiceById, deleteService } from '../../services/service.service';
 
@@ -93,59 +93,61 @@ const ServiceDetail = () => {
       <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 3 }}>
         <Typography variant="h4">Detalle del Servicio</Typography>
         <Box>
-          <Button 
-            variant="outlined" 
-            color="primary" 
-            component={Link} 
+          <Button
+            variant="outlined"
+            color="primary"
+            component={Link}
             to={`/services/${id}/edit`}
             sx={{ mr: 1 }}
           >
             Editar
           </Button>
-          <Button 
-            variant="outlined" 
-            color="error" 
+          <Button
+            variant="outlined"
+            color="error"
             onClick={handleDeleteClick}
           >
             Eliminar
           </Button>
         </Box>
       </Box>
-      
+
       <Paper elevation={3} sx={{ p: 3 }}>
         <Grid container spacing={2}>
           <Grid item xs={12}>
             <Typography variant="h5">{service.name}</Typography>
             <Divider sx={{ my: 2 }} />
           </Grid>
-          
+
           <Grid item xs={12} md={6}>
             <Typography variant="subtitle1" color="textSecondary">Proveedor</Typography>
-            <Typography variant="body1">{service.provider}</Typography>
+            <Typography variant="body1">
+              {service.provider_detail ? service.provider_detail.commercial_name : 'Sin proveedor'}
+            </Typography>
           </Grid>
-          
+
           <Grid item xs={12} md={6}>
             <Typography variant="subtitle1" color="textSecondary">Precio Base</Typography>
             <Typography variant="body1">${service.base_price}</Typography>
           </Grid>
-          
+
           <Grid item xs={12} md={6}>
             <Typography variant="subtitle1" color="textSecondary">Unidad de Medida</Typography>
             <Typography variant="body1">{renderUnitMeasure(service.unit_measure)}</Typography>
           </Grid>
-          
+
           <Grid item xs={12} md={6}>
             <Typography variant="subtitle1" color="textSecondary">Duración Estándar</Typography>
             <Typography variant="body1">
               {service.standard_duration ? `${service.standard_duration} minutos` : 'No aplicable'}
             </Typography>
           </Grid>
-          
+
           <Grid item xs={12}>
             <Typography variant="subtitle1" color="textSecondary">Descripción</Typography>
             <Typography variant="body1" sx={{ mt: 1 }}>{service.description}</Typography>
           </Grid>
-          
+
           <Grid item xs={12}>
             <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 2 }}>
               <Button component={Link} to="/services" color="primary">
@@ -155,7 +157,7 @@ const ServiceDetail = () => {
           </Grid>
         </Grid>
       </Paper>
-      
+
       {/* Diálogo de confirmación para eliminar */}
       <Dialog
         open={deleteDialogOpen}
@@ -164,7 +166,7 @@ const ServiceDetail = () => {
         <DialogTitle>Confirmar eliminación</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            ¿Estás seguro de que deseas eliminar el servicio "{service.name}"? 
+            ¿Estás seguro de que deseas eliminar el servicio "{service.name}"?
             Esta acción no se puede deshacer.
           </DialogContentText>
         </DialogContent>
