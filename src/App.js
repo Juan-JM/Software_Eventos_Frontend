@@ -14,13 +14,13 @@ import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns"
 import { es } from "date-fns/locale"
 //yebara comento
 
+// Layout principal
+import MainLayout from "./components/layout/MainLayout"
+
 // Componentes de autenticación
 import Login from "./components/auth/Login"
 import Register from "./components/auth/Register"
 import Logout from "./components/auth/Logout"
-
-// Componentes de layout
-import Navbar from "./components/layout/Navbar"
 
 // Componentes de usuarios
 import UserList from "./components/users/UserList"
@@ -81,13 +81,13 @@ import TaskList from "./components/tasks/TaskList"
 import TaskForm from "./components/tasks/TaskForm"
 import TaskDetail from "./components/tasks/TaskDetail"
 
-// Componentes de suscripción - COMENTADOS HASTA QUE LOS CREES
+// Componentes de suscripción
 import SubscriptionStatus from "./components/subscription/SubscriptionStatus"
 import SubscriptionPlans from "./components/subscription/SubscriptionPlans"
 import SubscriptionSuccess from "./components/subscription/SubscriptionSuccess"
 import SubscriptionRequired from "./components/subscription/SubscriptionRequired"
 
-// Página de inicio provisional
+// Página de inicio
 import Dashboard from "./components/dashboard/Dashboard"
 
 import BackupList from "./components/backups/BackupList"
@@ -117,123 +117,121 @@ function App() {
         <AuthProvider>
           <SubscriptionProvider>
             <AxiosInterceptors />
-            <Navbar />
-            <Routes>
-              {/* Rutas públicas */}
-              <Route path="/login" element={<Login />} />
-              <Route path="/register" element={<Register />} />
-              <Route path="/logout" element={<Logout />} />
+            <MainLayout>
+              <Routes>
+                {/* Rutas públicas */}
+                <Route path="/login" element={<Login />} />
+                <Route path="/register" element={<Register />} />
+                <Route path="/logout" element={<Logout />} />
 
-              {/* Rutas de suscripción */}
-              <Route element={<PrivateRoute allowedRoles={["admin", "staff", "superadmin"]} />}>
-                <Route path="/subscription" element={<SubscriptionStatus />} />
-                <Route path="/subscription/plans" element={<SubscriptionPlans />} />
-                <Route path="/subscription/success" element={<SubscriptionSuccess />} />
-                <Route path="/subscription/required" element={<SubscriptionRequired />} />
-              </Route>
+                {/* Rutas de suscripción */}
+                <Route element={<PrivateRoute allowedRoles={["admin", "staff", "superadmin"]} />}>
+                  <Route path="/subscription" element={<SubscriptionStatus />} />
+                  <Route path="/subscription/plans" element={<SubscriptionPlans />} />
+                  <Route path="/subscription/success" element={<SubscriptionSuccess />} />
+                  <Route path="/subscription/required" element={<SubscriptionRequired />} />
+                </Route>
 
-              {/* Rutas privadas - Admin y Superadmin */}
-              <Route element={<PrivateRoute allowedRoles={["admin", "superadmin"]} />}>
-                <Route path="/users" element={<UserList />} />
-                <Route path="/users/new" element={<UserForm />} />
-                <Route path="/users/:id" element={<UserDetail />} />
-                <Route path="/audit-logs" element={<AuditLogList />} />
-                <Route path="/backups" element={<BackupList />} />
-                <Route path="/sales-note" element={<SalesNoteScreen />} />
-                <Route path="/sales" element={<NotaVentaForm />} />
-                <Route path="/reporte-ventas" element={<ReporteVentas />} />
-              </Route>
+                {/* Rutas privadas - Admin y Superadmin */}
+                <Route element={<PrivateRoute allowedRoles={["admin", "superadmin"]} />}>
+                  <Route path="/users" element={<UserList />} />
+                  <Route path="/users/new" element={<UserForm />} />
+                  <Route path="/users/:id" element={<UserDetail />} />
+                  <Route path="/audit-logs" element={<AuditLogList />} />
+                  <Route path="/backups" element={<BackupList />} />
+                  <Route path="/sales-note" element={<SalesNoteScreen />} />
+                  <Route path="/sales" element={<NotaVentaForm />} />
+                  <Route path="/reporte-ventas" element={<ReporteVentas />} />
+                </Route>
 
-              {/* Rutas privadas - Solo Superadmin */}
-              <Route element={<PrivateRoute allowedRoles={["superadmin"]} />}>
-                <Route path="/companies" element={<CompanyList />} />
-                <Route path="/companies/new" element={<CompanyForm />} />
-                <Route path="/companies/:id" element={<CompanyDetail />} />
-                <Route path="/companies/:id/edit" element={<CompanyForm />} />
-              </Route>
+                {/* Rutas privadas - Solo Superadmin */}
+                <Route element={<PrivateRoute allowedRoles={["superadmin"]} />}>
+                  <Route path="/companies" element={<CompanyList />} />
+                  <Route path="/companies/new" element={<CompanyForm />} />
+                  <Route path="/companies/:id" element={<CompanyDetail />} />
+                  <Route path="/companies/:id/edit" element={<CompanyForm />} />
+                </Route>
 
-              {/* Rutas para Clientes */}
-              <Route element={<PrivateRoute allowedRoles={["customer", "admin", "staff"]} />}>
-                <Route path="/events" element={<EventList />} />
-                <Route path="/events/new" element={<EventForm />} />
-                <Route path="/events/:id" element={<EventDetail />} />
-                <Route path="/events/:id/edit" element={<EventForm />} />
+                {/* Rutas para Clientes */}
+                <Route element={<PrivateRoute allowedRoles={["customer", "admin", "staff"]} />}>
+                  <Route path="/events" element={<EventList />} />
+                  <Route path="/events/new" element={<EventForm />} />
+                  <Route path="/events/:id" element={<EventDetail />} />
+                  <Route path="/events/:id/edit" element={<EventForm />} />
 
-                {/* Rutas de Invitaciones */}
-                <Route path="/invitations" element={<InvitationList />} />
-                <Route path="/invitations/new" element={<InvitationForm />} />
-                <Route path="/invitations/:id" element={<InvitationDetail />} />
-                <Route path="/invitations/:id/edit" element={<InvitationForm />} />
-              </Route>
+                  {/* Rutas de Invitaciones */}
+                  <Route path="/invitations" element={<InvitationList />} />
+                  <Route path="/invitations/new" element={<InvitationForm />} />
+                  <Route path="/invitations/:id" element={<InvitationDetail />} />
+                  <Route path="/invitations/:id/edit" element={<InvitationForm />} />
+                </Route>
 
-              {/* Rutas privadas que requieren suscripción - Admin y Staff */}
-              <Route element={<SubscriptionProtectedRoute allowedRoles={["admin", "staff"]} />}>
-                {/* Rutas para Proveedores */}
-                <Route path="/providers" element={<ProviderList />} />
-                <Route path="/providers/new" element={<ProviderForm />} />
-                <Route path="/providers/:id" element={<ProviderDetail />} />
-                <Route path="/providers/:id/edit" element={<ProviderForm />} />
+                {/* Rutas privadas que requieren suscripción - Admin y Staff */}
+                <Route element={<SubscriptionProtectedRoute allowedRoles={["admin", "staff"]} />}>
+                  {/* Rutas para Proveedores */}
+                  <Route path="/providers" element={<ProviderList />} />
+                  <Route path="/providers/new" element={<ProviderForm />} />
+                  <Route path="/providers/:id" element={<ProviderDetail />} />
+                  <Route path="/providers/:id/edit" element={<ProviderForm />} />
 
-                {/* Rutas para Servicios */}
-                <Route path="/services" element={<ServiceList />} />
-                <Route path="/services/new" element={<ServiceForm />} />
-                <Route path="/services/:id" element={<ServiceDetail />} />
-                <Route path="/services/:id/edit" element={<ServiceForm />} />
+                  {/* Rutas para Servicios */}
+                  <Route path="/services" element={<ServiceList />} />
+                  <Route path="/services/new" element={<ServiceForm />} />
+                  <Route path="/services/:id" element={<ServiceDetail />} />
+                  <Route path="/services/:id/edit" element={<ServiceForm />} />
 
-                {/* Rutas para Paquetes */}
-                <Route path="/packages" element={<PackageList />} />
-                <Route path="/packages/new" element={<PackageForm />} />
-                <Route path="/packages/:id" element={<PackageDetail />} />
-                <Route path="/packages/:id/edit" element={<PackageForm />} />
+                  {/* Rutas para Paquetes */}
+                  <Route path="/packages" element={<PackageList />} />
+                  <Route path="/packages/new" element={<PackageForm />} />
+                  <Route path="/packages/:id" element={<PackageDetail />} />
+                  <Route path="/packages/:id/edit" element={<PackageForm />} />
 
-                {/* Rutas para Locaciones */}
-                <Route path="/locations" element={<LocationList />} />
-                <Route path="/locations/new" element={<LocationForm />} />
-                <Route path="/locations/:id" element={<LocationDetail />} />
-                <Route path="/locations/:id/edit" element={<LocationForm />} />
+                  {/* Rutas para Locaciones */}
+                  <Route path="/locations" element={<LocationList />} />
+                  <Route path="/locations/new" element={<LocationForm />} />
+                  <Route path="/locations/:id" element={<LocationDetail />} />
+                  <Route path="/locations/:id/edit" element={<LocationForm />} />
 
-                {/* Rutas para Eventos */}
-                <Route path="/events" element={<EventList />} />
-                <Route path="/events/new" element={<EventForm />} />
-                <Route path="/events/:id" element={<EventDetail />} />
-                <Route path="/events/:id/edit" element={<EventForm />} />
-                <Route path="/events/listado" element={<EventListByDate />} />
+                  {/* Rutas para Eventos */}
+                  <Route path="/events/listado" element={<EventListByDate />} />
 
-                {/* Rutas para Cronogramas - NUEVAS RUTAS */}
-                <Route path="/schedules" element={<ScheduleList />} />
-                <Route path="/schedules/new" element={<ScheduleForm />} />
-                <Route path="/schedules/:id" element={<ScheduleDetail />} />
-                <Route path="/schedules/:id/edit" element={<ScheduleForm />} />
+                  {/* Rutas para Cronogramas */}
+                  <Route path="/schedules" element={<ScheduleList />} />
+                  <Route path="/schedules/new" element={<ScheduleForm />} />
+                  <Route path="/schedules/:id" element={<ScheduleDetail />} />
+                  <Route path="/schedules/:id/edit" element={<ScheduleForm />} />
 
-                {/* Nueva Ruta para Agenda */}
-                <Route path="/agenda" element={<AgendaCalendar />} />
-              </Route>
+                  {/* Nueva Ruta para Agenda */}
+                  <Route path="/agenda" element={<AgendaCalendar />} />
+                </Route>
 
-              {/* Rutas para Personal - Solo Admin con suscripción */}
-              <Route element={<SubscriptionProtectedRoute allowedRoles={["admin"]} />}>
-                <Route path="/staff" element={<StaffList />} />
-                <Route path="/staff/new" element={<StaffForm />} />
-                <Route path="/staff/:id" element={<StaffDetail />} />
-                <Route path="/staff/:id/edit" element={<StaffForm />} />
-              </Route>
+                {/* Rutas para Personal - Solo Admin con suscripción */}
+                <Route element={<SubscriptionProtectedRoute allowedRoles={["admin"]} />}>
+                  <Route path="/staff" element={<StaffList />} />
+                  <Route path="/staff/new" element={<StaffForm />} />
+                  <Route path="/staff/:id" element={<StaffDetail />} />
+                  <Route path="/staff/:id/edit" element={<StaffForm />} />
+                </Route>
 
-              {/* Rutas para Tareas - Admin y Staff con suscripción */}
-              <Route element={<SubscriptionProtectedRoute allowedRoles={["admin", "staff"]} />}>
-                <Route path="/tasks" element={<TaskList />} />
-                <Route path="/tasks/new" element={<TaskForm />} />
-                <Route path="/tasks/:id" element={<TaskDetail />} />
-                <Route path="/tasks/:id/edit" element={<TaskForm />} />
-              </Route>
+                {/* Rutas para Tareas - Admin y Staff con suscripción */}
+                <Route element={<SubscriptionProtectedRoute allowedRoles={["admin", "staff"]} />}>
+                  <Route path="/tasks" element={<TaskList />} />
+                  <Route path="/tasks/new" element={<TaskForm />} />
+                  <Route path="/tasks/:id" element={<TaskDetail />} />
+                  <Route path="/tasks/:id/edit" element={<TaskForm />} />
+                </Route>
 
-              {/* Rutas básicas para usuarios autenticados */}
-              <Route element={<PrivateRoute />}>
-                <Route path="/dashboard" element={<Dashboard />} />
-                <Route path="/profile" element={<div>Mi Perfil</div>} />
-              </Route>
+                {/* Rutas básicas para usuarios autenticados */}
+                <Route element={<PrivateRoute />}>
+                  <Route path="/dashboard" element={<Dashboard />} />
+                  <Route path="/profile" element={<div>Mi Perfil</div>} />
+                  <Route path="/settings" element={<div>Configuración</div>} />
+                </Route>
 
-              {/* Redirigir a dashboard si no hay ruta */}
-              <Route path="/" element={<Navigate to="/dashboard" />} />
-            </Routes>
+                {/* Redirigir a dashboard si no hay ruta */}
+                <Route path="/" element={<Navigate to="/dashboard" />} />
+              </Routes>
+            </MainLayout>
           </SubscriptionProvider>
         </AuthProvider>
       </Router>

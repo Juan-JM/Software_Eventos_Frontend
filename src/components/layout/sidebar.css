@@ -1,0 +1,138 @@
+/* Estilos adicionales para el Sidebar */
+.sidebar-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(102, 126, 234, 0.3) transparent;
+}
+
+.sidebar-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.sidebar-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.sidebar-scrollbar::-webkit-scrollbar-thumb {
+  background-color: rgba(102, 126, 234, 0.3);
+  border-radius: 3px;
+}
+
+.sidebar-scrollbar::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(102, 126, 234, 0.5);
+}
+
+/* Animaciones para el sidebar */
+@keyframes slideInLeft {
+  from {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.sidebar-item-enter {
+  animation: slideInLeft 0.3s ease-out;
+}
+
+.sidebar-group-enter {
+  animation: fadeIn 0.2s ease-out;
+}
+
+/* Efectos de hover mejorados */
+.sidebar-item-hover {
+  position: relative;
+  overflow: hidden;
+}
+
+.sidebar-item-hover::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(102, 126, 234, 0.1), transparent);
+  transition: left 0.5s;
+}
+
+.sidebar-item-hover:hover::before {
+  left: 100%;
+}
+
+/* Estilos para el backdrop en mobile */
+.sidebar-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1200;
+  opacity: 0;
+  transition: opacity 0.3s ease-in-out;
+}
+
+.sidebar-backdrop.open {
+  opacity: 1;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .sidebar-content {
+    width: 100%;
+    max-width: 280px;
+  }
+  
+  .sidebar-header {
+    padding: 1rem;
+  }
+  
+  .sidebar-nav-item {
+    padding: 0.75rem 1rem;
+  }
+}
+
+/* Mejoras para la accesibilidad */
+.sidebar-nav-item:focus {
+  outline: 2px solid #667eea;
+  outline-offset: 2px;
+}
+
+.sidebar-group-header:focus {
+  outline: 2px solid #667eea;
+  outline-offset: 2px;
+}
+
+/* Estilos para el estado de carga */
+.sidebar-loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 200px;
+}
+
+.sidebar-loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid #f3f3f3;
+  border-top: 3px solid #667eea;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}

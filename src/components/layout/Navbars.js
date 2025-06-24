@@ -42,7 +42,7 @@ import {
 } from "@mui/icons-material"
 import { logout } from "../../services/auth.service"
 
-const Navbar = () => {
+const Navbars = () => {
   const { currentUser, setCurrentUser } = useAuth()
   const { hasSubscriptionAccess } = useSubscription()
   const navigate = useNavigate()
@@ -392,4 +392,4 @@ const Navbar = () => {
   )
 }
 
-export default Navbar
+export default Navbars
