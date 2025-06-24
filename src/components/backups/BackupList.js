@@ -4,7 +4,7 @@ import api from '../../services/api';
 
 const BackupList = () => {
   const [backups, setBackups] = useState([]);
-  const baseURL = "http://localhost:8000/api";
+  // const baseURL = "http://localhost:8000/api";
 
   const fetchBackups = async () => {
     try {
@@ -21,7 +21,8 @@ const BackupList = () => {
 
     try {
       //const token = localStorage.getItem("access_token"); 
-      await api.post(`${baseURL}/backup/generate/`);
+      // await api.post(`${baseURL}/backup/generate/`);
+      await api.post('backup/generate/');
       alert("Backup generado correctamente");
       fetchBackups();
     } catch (error) {
@@ -31,8 +32,9 @@ const BackupList = () => {
   };
 
   const downloadBackup = (fileName) => {
-    const baseUrl = "http://localhost:8000/media/"; //No agregar 'api', esto es para que acceda a la carpeta donde se guardan los backups generados 
-    const url = `${baseUrl}backups/${fileName}`
+    // const baseUrl = "http://localhost:8000/media/"; //No agregar 'api', esto es para que acceda a la carpeta donde se guardan los backups generados 
+    // const url = `${baseUrl}backups/${fileName}`
+    const url = `${api.defaults.baseURL.replace('/api/', '/media/')}backups/${fileName}`
     window.open(url, "_blank");
   };
 
